@@ -1,0 +1,70 @@
+import { NextResponse } from "next/server";
+import { rtdb, admin } from "@/lib/firebaseAdmin";
+
+export async function POST(request: Request) {
+  try {
+    const { bookingId, userId, status } = await request.json();
+
+    if (!bookingId || !status) {
+      return NextResponse.json({ message: "Thiếu thông tin" }, { status: 400 });
+    }
+
+    // Kiểm tra booking tồn tại
+    const bookingRef = rtdb.ref(`bookings/${bookingId}`);
+    const bookingSnapshot = await bookingRef.once("value");
+
+    if (!bookingSnapshot.exists()) {
+      return NextResponse.json({ message: "Không tìm thấy đơn hàng" }, { status: 404 });
+    }
+
+    const bookingData = bookingSnapshot.val();
+
+    // Cập nhật status
+    await bookingRef.update({ status });
+
+    // Gửi thông báo cho user nếu có userId
+    const targetUserId = userId || bookingData?.userId;
+    if (targetUserId && targetUserId !== "guest") {
+      const notificationConfig: Record<string, { title: string; description: string }> = {
+        "Đã xác nhận": {
+          title: "✅ Đơn hàng đã được xác nhận",
+          description: `Đơn hàng #${bookingId.slice(-6)} của bạn đã được xác nhận. Chúng tôi đang chuẩn bị dịch vụ cho bạn!`,
+        },
+        "Đang dùng": {
+          title: "🎤 Bắt đầu dịch vụ",
+          description: `Phòng của bạn đã sẵn sàng. Chúc bạn có những phút giây thư giãn tuyệt vời tại Monaco!`,
+        },
+        "Đã hủy": {
+          title: "❌ Đơn hàng đã bị hủy",
+          description: `Đơn hàng #${bookingId.slice(-6)} của bạn đã bị hủy. Nếu có thắc mắc vui lòng liên hệ hotline 084.680.7777.`,
+        },
+        "Đã thanh toán": {
+          title: "💰 Thanh toán hoàn tất",
+          description: `Đơn hàng #${bookingId.slice(-6)} đã hoàn tất thanh toán. Cảm ơn và hẹn gặp lại quý khách!`,
+        },
+      };
+
+      const config = notificationConfig[status];
+      if (config) {
+        const notificationRef = rtdb.ref(`notifications/personal/${targetUserId}`).push();
+        await notificationRef.set({
+          title: config.title,
+          description: config.description,
+          href: `/orders/${bookingId}`,
+          type: "order",
+          time: "Mới đây",
+          createdAt: admin.database.ServerValue.TIMESTAMP,
+          read: false,
+        });
+      }
+    }
+
+    return NextResponse.json({ 
+      message: "Cập nhật trạng thái thành công", 
+      status 
+    }, { status: 200 });
+  } catch (error: any) {
+    console.error("Update booking status error:", error);
+    return NextResponse.json({ message: "Lỗi hệ thống", error: error.message }, { status: 500 });
+  }
+}

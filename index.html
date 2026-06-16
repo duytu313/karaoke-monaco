@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monaco Karaoke Gold Card</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0d0d0d;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #ffffff;
+        }
+
+        .card {
+            width: 800px;
+            height: 400px;
+            border-radius: 30px;
+            overflow: hidden;
+            border: 2px solid #5a4b39;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            position: relative;
+            background: #111;
+            background-image: 
+                radial-gradient(circle at top right, rgba(160, 20, 30, 0.5) 0%, rgba(10, 10, 10, 1) 70%),
+                radial-gradient(circle at bottom right, rgba(180, 140, 70, 0.3) 0%, rgba(10, 10, 10, 1) 50%);
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        /* Elements absolute positioned for precise layout */
+        .card::before { /* Curtain element */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to right, transparent 60%, rgba(160, 20, 30, 0.7) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .card-inner {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .mẫu-9 {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            padding: 8px 16px;
+            border: 1px solid #777;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #ccc;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+        }
+
+        .podium-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 20px;
+        }
+
+        .podium-stage {
+            width: 320px;
+            height: 180px;
+            background-image: radial-gradient(circle, #ff0000 0%, #aa0000 60%, #000 100%);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: inset 0 -30px 40px -10px #000;
+            position: relative;
+            z-index: 5;
+        }
+
+        .stage-lights {
+            position: absolute;
+            bottom: -5px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .stage-light {
+            width: 10px;
+            height: 10px;
+            background-color: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 4px #ffd700;
+        }
+
+        .gold-crown-icon-frame {
+            position: absolute;
+            top: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .gold-crown-icon {
+            width: 140px;
+            margin-bottom: 5px;
+        }
+
+        .sparkle {
+            position: absolute;
+            background-color: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 5px 2px #ffd700;
+        }
+
+        .podium-details {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 15;
+        }
+
+        .monaco-logo {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffd700;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .monaco-subtitle {
+            font-size: 14px;
+            color: #ccc;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .podium-gold-line {
+            width: 60px;
+            height: 2px;
+            background-color: #ffd700;
+            margin-top: 15px;
+        }
+
+        .points-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .rank-box {
+            border: 2px solid #5a4b39;
+            border-radius: 12px;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-self: flex-end;
+        }
+
+        .rank-label {
+            font-size: 16px;
+            color: #ccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .rank-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffd700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .points-display {
+            width: 100%;
+            text-align: right;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .points-label {
+            font-size: 18px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .points-value {
+            font-size: 90px;
+            font-weight: 700;
+            color: #e5b35c;
+            line-height: 1;
+            margin: 0;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .points-unit {
+            font-size: 32px;
+            color: #e5b35c;
+            vertical-align: super;
+            margin-left: 10px;
+        }
+
+        .button-section {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .detail-button {
+            display: flex;
+            align-items: center;
+            background: #a82229;
+            padding: 18px 40px;
+            border-radius: 40px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .detail-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .detail-button-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            margin-right: 15px;
+        }
+
+        .button-lights {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .button-light {
+            width: 4px;
+            height: 4px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 6px 3px #fff;
+        }
+
+        .detail-arrow-circle {
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .arrow {
+            width: 14px;
+            height: 14px;
+            border-top: 3px solid #ffd700;
+            border-right: 3px solid #ffd700;
+            transform: rotate(45deg);
+            margin-left: -5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="mẫu-9">MẪU 9</div>
+
+    <div class="podium-section">
+        <div class="podium-stage">
+            <div class="stage-lights">
+                <div class="stage-light"></div>
+                <div class="stage-light"></div>
+                <div class="stage-light"></div>
+                <div class="stage-light"></div>
+                <div class="stage-light"></div>
+                <div class="stage-light"></div>
+            </div>
+            <div class="gold-crown-icon-frame">
+                <img src="https://i.imgur.com/vHq4R7y.png" alt="Monaco Crown" class="gold-crown-icon">
+                <div class="sparkle" style="top: 30px; left: -15px; width: 3px; height: 3px;"></div>
+                <div class="sparkle" style="top: -10px; left: 10px; width: 4px; height: 4px;"></div>
+                <div class="sparkle" style="top: 20px; left: 45px; width: 3px; height: 3px;"></div>
+                <div class="sparkle" style="top: 10px; left: -30px; width: 4px; height: 4px;"></div>
+            </div>
+            <div class="podium-details">
+                <div class="monaco-logo">MONACO</div>
+                <div class="monaco-subtitle">KARAOKE</div>
+                <div class="podium-gold-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="points-section">
+        <div class="rank-box">
+            <span class="rank-label">HẠNG</span>
+            <span class="rank-value">GOLD</span>
+        </div>
+        <div class="points-display">
+            <span class="points-label">ĐIỂM TÍCH LŨY</span>
+            <p class="points-value">2,450<span class="points-unit">điểm</span></p>
+        </div>
+        <div class="button-section">
+            <button class="detail-button">
+                <div class="button-lights">
+                    <div class="button-light" style="margin-left: 10px;"></div>
+                    <div class="button-light" style="margin-right: 10px;"></div>
+                    <div class="button-light" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);"></div>
+                    <div class="button-light" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);"></div>
+                </div>
+                <span class="detail-button-text">XEM CHI TIẾT</span>
+                <div class="detail-arrow-circle">
+                    <div class="arrow"></div>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
