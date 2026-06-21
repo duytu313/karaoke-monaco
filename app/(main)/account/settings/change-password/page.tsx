@@ -70,7 +70,7 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Link href="/account/settings">

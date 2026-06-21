@@ -124,7 +124,7 @@ export default function NotificationDetailPage() {
   const Icon = notification ? iconMap[notification.type] || Info : Info
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-foreground hover:bg-accent/50" onClick={() => router.push("/notifications")}>
@@ -134,7 +134,7 @@ export default function NotificationDetailPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-md px-4 py-6 pb-24">
+      <main className="mx-auto w-full px-4 py-6 pb-24">
         {isLoading ? (
           <div className="rounded-2xl border border-border/50 bg-card p-6 text-center text-sm text-muted-foreground">
             Đang tải chi tiết thông báo...

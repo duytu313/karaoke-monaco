@@ -72,7 +72,7 @@ export default function AddressesPage() {
   const isAccountLoading = loading || isLoading
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10 pb-32">
+    <div className="min-h-screen w-full bg-background flex flex-col pb-32">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center justify-between px-4 py-4">
@@ -92,12 +92,12 @@ export default function AddressesPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 space-y-6 mt-2">
-        <div className="space-y-4">
+      <main className="flex-1 p-4 space-y-[1cm] mt-2">
+        <div className="space-y-[1cm]">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1">Danh sách địa chỉ</p>
           
           {addresses.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-[1cm]">
               {addresses.map((addr) => (
                 <Card key={addr.id} className="p-4 border-border/50 shadow-sm relative overflow-hidden group">
                   <div className="flex gap-4">
@@ -165,7 +165,7 @@ export default function AddressesPage() {
 
       {/* Bottom Action */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-lg border-t border-border/30 z-40">
-        <div className="mx-auto max-w-md">
+        <div className="mx-auto w-full">
           <Link href="/account/addresses/new">
             <Button className="w-full h-12 bg-accent hover:bg-accent/90 text-accent-foreground font-bold rounded-xl shadow-lg flex items-center justify-center gap-2">
               <Plus className="h-5 w-5" />

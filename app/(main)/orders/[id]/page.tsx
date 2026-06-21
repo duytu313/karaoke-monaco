@@ -353,7 +353,7 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10 pb-32">
+    <div className="min-h-screen w-full bg-background flex flex-col pb-32">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Link href="/orders">
@@ -583,7 +583,7 @@ export default function OrderDetailPage() {
       </main>
 
       {!isEditing && isStaff && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 flex gap-2 mx-auto max-w-md z-[60] bg-background/95 backdrop-blur-lg py-4 border-t border-border/30 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+        <div className="fixed bottom-20 left-0 right-0 px-4 flex gap-2 mx-auto w-full z-[60] bg-background/95 backdrop-blur-lg py-4 border-t border-border/30 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
           {order.status === "Chờ xác nhận" && (
             <>
               <Button 
@@ -670,7 +670,7 @@ export default function OrderDetailPage() {
       )}
 
       {!isEditing && !isStaff && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 flex gap-3 mx-auto max-w-md z-[60] bg-background/95 backdrop-blur-lg py-4 border-t border-border/30 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+        <div className="fixed bottom-20 left-0 right-0 px-4 flex gap-3 mx-auto w-full z-[60] bg-background/95 backdrop-blur-lg py-4 border-t border-border/30 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
           {order.status === "Chờ xác nhận" && (
             <>
               <Button variant="outline" className="flex-1 bg-background border-red-500/50 text-red-500 hover:bg-red-50" onClick={() => setIsCanceling(true)}>
@@ -697,7 +697,7 @@ export default function OrderDetailPage() {
       )}
 
       {isEditing && (
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-background border-t border-border/30 flex gap-3 mx-auto max-w-md z-[60] animate-in slide-in-from-bottom shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-background border-t border-border/30 flex gap-3 mx-auto w-full z-[60] animate-in slide-in-from-bottom shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
           <Button variant="outline" className="flex-1" onClick={() => { setIsEditing(false); setEditForm(order); }}>
             <X className="h-4 w-4 mr-2" /> Hủy bỏ
           </Button>

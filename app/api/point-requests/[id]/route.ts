@@ -16,7 +16,7 @@ async function sendPointExchangeNotification(
     href,
     type: "system",
     time: "Mới đây",
-    createdAt: admin.database.ServerValue.TIMESTAMP,
+    createdAt: Date.now(),
     read: false,
   });
 }
@@ -125,7 +125,7 @@ export async function PATCH(
         serviceType: rewardInfo.serviceType,
         pointsCost: rewardPointsCost,
         status: "active",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
       };
 
       // Chỉ thêm discountAmount hoặc discountRate nếu có
@@ -143,13 +143,13 @@ export async function PATCH(
         type: "spend",
         requestId: id,
         points: -rewardPointsCost,
-        timestamp: admin.database.ServerValue.TIMESTAMP,
+        timestamp: Date.now(),
         description: `Đổi thưởng "${rewardTitle}"`,
       });
 
       await rtdb.ref(`pointRequests/${id}`).update({
         status,
-        reviewedAt: admin.database.ServerValue.TIMESTAMP,
+        reviewedAt: Date.now(),
       });
 
       await sendPointExchangeNotification(
@@ -164,7 +164,7 @@ export async function PATCH(
     if (status === "rejected") {
       await rtdb.ref(`pointRequests/${id}`).update({
         status,
-        reviewedAt: admin.database.ServerValue.TIMESTAMP,
+        reviewedAt: Date.now(),
       });
 
       await sendPointExchangeNotification(

@@ -205,7 +205,7 @@ export async function POST(request: Request) {
         // Admin xác nhận đơn
         await bookingRef.update({ 
           status: "Đã xác nhận", 
-          confirmedAt: admin.database.ServerValue.TIMESTAMP 
+          confirmedAt: Date.now() 
         });
         
         if (userId && userId !== "guest") {
@@ -216,7 +216,7 @@ export async function POST(request: Request) {
             href: `/orders/${bookingId}`,
             type: "order",
             time: "Mới đây",
-            createdAt: admin.database.ServerValue.TIMESTAMP,
+            createdAt: Date.now(),
             read: false,
           });
         }
@@ -226,7 +226,7 @@ export async function POST(request: Request) {
         // Lễ tân xác nhận khách đã đến
         await bookingRef.update({
           status: "Đã đến",
-          arrivedAt: admin.database.ServerValue.TIMESTAMP
+          arrivedAt: Date.now()
         });
 
         if (userId && userId !== "guest") {
@@ -237,7 +237,7 @@ export async function POST(request: Request) {
             href: `/orders/${bookingId}`,
             type: "order",
             time: "Mới đây",
-            createdAt: admin.database.ServerValue.TIMESTAMP,
+            createdAt: Date.now(),
             read: false,
           });
         }
@@ -247,7 +247,7 @@ export async function POST(request: Request) {
         // Admin hủy đơn
         await bookingRef.update({ 
           status: "Đã hủy", 
-          cancelledAt: admin.database.ServerValue.TIMESTAMP,
+          cancelledAt: Date.now(),
           cancelNote: receptionistNote || ""
         });
         
@@ -259,7 +259,7 @@ export async function POST(request: Request) {
             href: `/orders/${bookingId}`,
             type: "order",
             time: "Mới đây",
-            createdAt: admin.database.ServerValue.TIMESTAMP,
+            createdAt: Date.now(),
             read: false,
           });
         }
@@ -269,7 +269,7 @@ export async function POST(request: Request) {
         // Lễ tân xác nhận khách đang sử dụng
         await bookingRef.update({ 
           status: "Đang dùng", 
-          startedAt: admin.database.ServerValue.TIMESTAMP 
+          startedAt: Date.now() 
         });
 
         if (userId && userId !== "guest") {
@@ -280,7 +280,7 @@ export async function POST(request: Request) {
             href: `/orders/${bookingId}`,
             type: "order",
             time: "Mới đây",
-            createdAt: admin.database.ServerValue.TIMESTAMP,
+            createdAt: Date.now(),
             read: false,
           });
         }
@@ -295,7 +295,7 @@ export async function POST(request: Request) {
         
         await bookingRef.update({ 
           status: "Đã thanh toán", 
-          completedAt: admin.database.ServerValue.TIMESTAMP,
+          completedAt: Date.now(),
           finalAmount: finalAmount,
           paidAmount: finalAmount, // Cập nhật tổng tiền đã thanh toán bằng tổng hóa đơn cuối cùng
           pointsEarned: pointsAdded
@@ -334,7 +334,7 @@ export async function POST(request: Request) {
               type: "earn",
               bookingId,
               points: pointsAdded,
-              timestamp: admin.database.ServerValue.TIMESTAMP,
+              timestamp: Date.now(),
               description: `Tích điểm từ đơn hàng #${bookingId} (${new Intl.NumberFormat("vi-VN").format(finalAmount)}đ)`,
             };
 
@@ -353,7 +353,7 @@ export async function POST(request: Request) {
               href: `/orders/${bookingId}`, // Ensure this path is correct for the client app
               type: "order",
               time: "Mới đây",
-              createdAt: admin.database.ServerValue.TIMESTAMP,
+              createdAt: Date.now(),
               read: false,
             });
           } else {

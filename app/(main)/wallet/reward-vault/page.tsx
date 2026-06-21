@@ -38,7 +38,7 @@ export default function RewardVaultPage() {
   const usedRewards = rewards.filter((r: any) => r.status === "used")
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Link href="/wallet">
@@ -53,7 +53,7 @@ export default function RewardVaultPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 space-y-6 pb-24">
+      <main className="flex-1 p-4 space-y-[1cm] pb-24">
         {/* Phần thưởng đang hoạt động */}
         <section>
           <h2 className="text-xs font-bold uppercase tracking-widest text-primary mb-3 flex items-center gap-2">
@@ -63,7 +63,7 @@ export default function RewardVaultPage() {
           {loading ? (
             <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground/40" /></div>
           ) : activeRewards.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-[1cm]">
               {activeRewards.map((reward: any) => (
                 <Card key={reward.id} className="p-4 border-emerald-200 bg-emerald-50/30">
                   <div className="flex items-start gap-3">
@@ -106,7 +106,7 @@ export default function RewardVaultPage() {
             <h2 className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" /> Đang sử dụng ({pendingRewards.length})
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-[1cm]">
               {pendingRewards.map((reward: any) => (
                 <Card key={reward.id} className="p-3 border-amber-200 bg-amber-50/50">
                   <div className="flex items-center gap-3">
@@ -128,7 +128,7 @@ export default function RewardVaultPage() {
         {usedRewards.length > 0 && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Đã sử dụng</h2>
-            <div className="space-y-2">
+            <div className="space-y-[1cm]">
               {usedRewards.map((reward: any) => (
                 <Card key={reward.id} className="p-3 border-border/30 bg-muted/20">
                   <div className="flex items-center gap-3">

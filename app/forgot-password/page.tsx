@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <main className="min-h-screen w-full bg-background flex flex-col">
       {/* Header */}
       <header className="pt-6 px-6">
         <Link
@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
       </header>
 
       <div className="pt-8 pb-8 px-6">
-        <h1 className="text-2xl font-bold text-center text-foreground">Quên mật khẩu</h1>
+        <h1 className="text-4xl font-bold text-center text-foreground">Quên mật khẩu</h1>
       </div>
 
       {/* Content */}
@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg"
+                className="w-full h-16 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl"
               >
                 Gửi yêu cầu
               </Button>
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
             <Button
               asChild
               variant="outline"
-              className="w-full h-12 border-border/50 text-foreground font-medium rounded-lg"
+              className="w-full h-16 text-lg border-border/50 text-foreground font-medium rounded-xl"
             >
               <Link href="/login">Quay về đăng nhập</Link>
             </Button>

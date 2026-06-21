@@ -97,7 +97,7 @@ export default function WalletTasksPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Link href="/wallet">
@@ -112,7 +112,7 @@ export default function WalletTasksPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 space-y-6 pb-24">
+      <main className="flex-1 p-4 space-y-[1cm] pb-24">
         {/* Thống kê nhanh */}
         {stats && (
           <div className="grid grid-cols-2 gap-3">
@@ -152,7 +152,7 @@ export default function WalletTasksPage() {
           </div>
 
           {loading ? (
-            <div className="space-y-3">
+            <div className="space-y-[1cm]">
               {[1, 2, 3].map((i) => (
                 <Card key={i} className="p-4 border-border/50 animate-pulse">
                   <div className="h-4 bg-muted rounded w-1/2 mb-2" />
@@ -166,7 +166,7 @@ export default function WalletTasksPage() {
               {user ? "Đang tải nhiệm vụ..." : "Đăng nhập để xem nhiệm vụ"}
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-[1cm]">
               {tasks.map((task) => {
                 const progress = getProgress(task)
                 const isComplete = progress >= 100 && task.status !== "claimed"

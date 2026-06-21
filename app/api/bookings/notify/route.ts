@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         href: `/orders/${bookingId}`,
         type: "order",
         time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
         read: false,
       });
     }

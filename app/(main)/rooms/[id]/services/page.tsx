@@ -242,7 +242,7 @@ export default function ServicesPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border/30 bg-background/95 backdrop-blur-lg">
-        <div className="mx-auto flex max-w-md flex-col gap-3 px-4 py-4">
+        <div className="mx-auto flex w-full flex-col gap-3 px-4 py-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="shrink-0" onClick={handleBack}>
               <ArrowLeft className="h-5 w-5" />
@@ -254,7 +254,7 @@ export default function ServicesPage() {
       </header>
       
       {/* Search Bar */}
-      <div className="mx-auto max-w-md px-4 py-3">
+      <div className="mx-auto w-full px-4 py-3">
         <Input
           placeholder="Tìm kiếm dịch vụ..."
           value={searchTerm}
@@ -262,7 +262,7 @@ export default function ServicesPage() {
           className="h-11 rounded-xl bg-muted/50 border-none"
         />
       </div>
-      <main className="mx-auto max-w-md space-y-6 px-4 py-4 pb-48">
+      <main className="mx-auto w-full space-y-6 px-4 py-4 pb-48">
         {/* Transparency Commitment Section */}
         <section className="space-y-3">
           <div className="rounded-2xl bg-primary/10 border border-primary/20 p-4 space-y-3 shadow-sm">
@@ -369,7 +369,7 @@ export default function ServicesPage() {
 
       {/* Bottom Summary */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/30 bg-background/95 p-4 pb-24 backdrop-blur-lg shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
-        <div className="mx-auto max-w-md space-y-4">
+        <div className="mx-auto w-full space-y-4">
           <div className="flex items-start gap-2 px-1">
             <AlertCircle className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
             <p className="text-[11px] text-muted-foreground italic leading-tight font-medium">

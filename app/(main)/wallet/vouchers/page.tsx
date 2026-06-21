@@ -134,7 +134,7 @@ export default function WalletVouchersPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Link href="/wallet">
@@ -149,7 +149,7 @@ export default function WalletVouchersPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 space-y-6 pb-24">
+      <main className="flex-1 p-4 space-y-[1cm] pb-24">
         {/* Thông báo */}
         {message && (
           <div className={cn(
@@ -187,7 +187,7 @@ export default function WalletVouchersPage() {
               Bạn chưa có voucher nào. Hãy đổi ngay!
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-[1cm]">
               {ownVouchers.map((v) => (
                 <Card key={v.key} className={cn(
                   "p-4 border-2",
@@ -250,7 +250,7 @@ export default function WalletVouchersPage() {
             <h2 className="text-xs font-bold uppercase tracking-widest text-foreground">Danh sách voucher</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-[1cm]">
             {availableVouchers.map((v) => (
               <Card key={v.id} className="border border-border/50 bg-card overflow-hidden">
                 <div className="p-4">

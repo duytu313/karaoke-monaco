@@ -110,20 +110,20 @@ export default function PromotionsListPage() {
   const regularPromotions = activePromotions.filter((p) => !p.featured)
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
-        <div className="flex items-center gap-3 px-4 py-4">
+        <div className="flex items-center gap-4 px-5 py-5">
           <Link href="/home">
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-foreground hover:bg-accent/50">
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full text-foreground hover:bg-accent/50">
+              <ArrowLeft className="h-6 w-6" />
             </Button>
           </Link>
-          <h1 className="text-lg font-semibold text-foreground">Tất cả khuyến mãi</h1>
+          <h1 className="text-2xl font-bold text-foreground">Tất cả khuyến mãi</h1>
           {isAdmin && (
             <Button
               variant="ghost"
               size="sm"
-              className="ml-auto text-primary"
+              className="ml-auto text-primary text-base"
               onClick={() => setShowAdmin(!showAdmin)}
             >
               {showAdmin ? "Đóng" : "Quản lý"}
@@ -167,7 +167,7 @@ export default function PromotionsListPage() {
       {editingPromo && (
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm overflow-y-auto">
           <div className="min-h-full flex items-center justify-center p-4">
-            <Card className="w-full max-w-md p-6 space-y-4 animate-in zoom-in-95 duration-200">
+            <Card className="w-full w-full p-6 space-y-4 animate-in zoom-in-95 duration-200">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-lg">
                   {promotions.find((p) => p.id === editingPromo.id) ? "Sửa khuyến mãi" : "Thêm khuyến mãi"}
@@ -223,49 +223,49 @@ export default function PromotionsListPage() {
         </div>
       )}
 
-      <main className="flex-1 p-4 py-6 space-y-8 pb-24">
+      <main className="flex-1 p-5 py-6 space-y-8 pb-24">
         {loading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/40" />
+            <Loader2 className="h-10 w-10 animate-spin text-muted-foreground/40" />
           </div>
         ) : (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Khuyến mãi nổi bật */}
             {featuredPromotions.length > 0 && (
               <section>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-lg">🌟</span>
-                  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Khuyến mãi nổi bật</h2>
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="text-2xl">🌟</span>
+                  <h2 className="text-lg font-bold uppercase tracking-widest text-foreground">Khuyến mãi nổi bật</h2>
                 </div>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-[1cm]">
                   {featuredPromotions.map((promo) => (
                     <div key={promo.id} className="relative">
                       <Link href={`/promotions/${promo.id}`} className="block group">
                         <Card className="overflow-hidden border-primary/30 shadow-lg rounded-[2rem] bg-card border-2 group-hover:border-primary transition-all p-0">
-                          <div className="relative h-52 w-full">
+                          <div className="relative h-56 w-full">
                             <Image src={promo.imageUrl} alt={promo.title} fill className="object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                            <div className="absolute top-3 left-3">
-                              <span className="bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-full">
+                            <div className="absolute top-4 left-4">
+                              <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">
                                 🔥 Nổi bật
                               </span>
                             </div>
-                            <div className="absolute bottom-3 left-4 right-4">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Khuyến mãi</p>
-                              <h3 className="text-xl font-bold text-white leading-tight uppercase tracking-tighter">{promo.title}</h3>
-                              <p className="text-sm font-semibold text-primary/90 tracking-tight">{promo.subtitle}</p>
+                            <div className="absolute bottom-4 left-5 right-5">
+                              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Khuyến mãi</p>
+                              <h3 className="text-2xl font-bold text-white leading-tight uppercase tracking-tighter">{promo.title}</h3>
+                              <p className="text-base font-semibold text-primary/90 tracking-tight">{promo.subtitle}</p>
                             </div>
                           </div>
-                          <div className="p-4 bg-card space-y-2">
-                            <p className="text-xs text-muted-foreground line-clamp-2 italic">{promo.content}</p>
+                          <div className="p-5 bg-card space-y-2">
+                            <p className="text-sm text-muted-foreground line-clamp-2 italic">{promo.content}</p>
                             {promo.startDate && (
-                              <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="h-3 w-3" /> {formatDate(promo.startDate)}
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1.5">
+                                  <Calendar className="h-4 w-4" /> {formatDate(promo.startDate)}
                                 </span>
                                 <span>→</span>
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" /> {formatDate(promo.endDate)}
+                                <span className="flex items-center gap-1.5">
+                                  <Clock className="h-4 w-4" /> {formatDate(promo.endDate)}
                                 </span>
                               </div>
                             )}
@@ -273,11 +273,11 @@ export default function PromotionsListPage() {
                         </Card>
                       </Link>
                       {isAdmin && showAdmin && (
-                        <div className="absolute top-3 right-3 flex gap-1 z-10">
-                          <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/90" onClick={() => setEditingPromo(promo)}>
+                        <div className="absolute top-4 right-4 flex gap-1 z-10">
+                          <Button variant="secondary" size="icon" className="h-9 w-9 bg-white/90" onClick={() => setEditingPromo(promo)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/90 text-red-500" onClick={() => handleDelete(promo.id)}>
+                          <Button variant="secondary" size="icon" className="h-9 w-9 bg-white/90 text-red-500" onClick={() => handleDelete(promo.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -291,37 +291,37 @@ export default function PromotionsListPage() {
             {/* Khuyến mãi thường */}
             {regularPromotions.length > 0 && (
               <section>
-                <div className="flex items-center gap-2 mb-4">
-                  <Ticket className="h-4 w-4 text-primary" />
-                  <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Khuyến mãi khác</h2>
+                <div className="flex items-center gap-2 mb-5">
+                  <Ticket className="h-5 w-5 text-primary" />
+                  <h2 className="text-lg font-bold uppercase tracking-widest text-foreground">Khuyến mãi khác</h2>
                 </div>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-[1cm]">
                   {regularPromotions.map((promo) => (
                     <div key={promo.id} className="relative">
                       <Link href={`/promotions/${promo.id}`} className="block group">
                         <Card className="overflow-hidden border-border/50 shadow-md rounded-[2rem] group-hover:border-primary/50 bg-card p-0 border-none shadow-lg">
-                          <div className="relative h-48 w-full">
+                          <div className="relative h-52 w-full">
                             <Image src={promo.imageUrl} alt={promo.title} fill className="object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                            <div className="absolute bottom-3 left-4 right-4">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Khuyến mãi</p>
-                              <h3 className="text-lg font-bold text-white leading-tight uppercase tracking-tighter">{promo.title}</h3>
-                              <p className="text-xs font-semibold text-primary/90 tracking-tight">{promo.subtitle}</p>
+                            <div className="absolute bottom-4 left-5 right-5">
+                              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Khuyến mãi</p>
+                              <h3 className="text-xl font-bold text-white leading-tight uppercase tracking-tighter">{promo.title}</h3>
+                              <p className="text-sm font-semibold text-primary/90 tracking-tight">{promo.subtitle}</p>
                             </div>
-                            <div className="absolute top-3 right-4 h-8 w-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-primary shadow-lg">
-                              <Ticket className="h-4 w-4" />
+                            <div className="absolute top-3 right-4 h-9 w-9 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-primary shadow-lg">
+                              <Ticket className="h-5 w-5" />
                             </div>
                           </div>
-                          <div className="p-4 bg-card space-y-2">
-                            <p className="text-xs text-muted-foreground line-clamp-2 italic leading-relaxed">{promo.content}</p>
+                          <div className="p-5 bg-card space-y-2">
+                            <p className="text-sm text-muted-foreground line-clamp-2 italic leading-relaxed">{promo.content}</p>
                             {promo.startDate && (
-                              <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="h-3 w-3" /> {formatDate(promo.startDate)}
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1.5">
+                                  <Calendar className="h-4 w-4" /> {formatDate(promo.startDate)}
                                 </span>
                                 <span>→</span>
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" /> {formatDate(promo.endDate)}
+                                <span className="flex items-center gap-1.5">
+                                  <Clock className="h-4 w-4" /> {formatDate(promo.endDate)}
                                 </span>
                               </div>
                             )}
@@ -329,11 +329,11 @@ export default function PromotionsListPage() {
                         </Card>
                       </Link>
                       {isAdmin && showAdmin && (
-                        <div className="absolute top-3 right-3 flex gap-1 z-10">
-                          <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/90" onClick={() => setEditingPromo(promo)}>
+                        <div className="absolute top-4 right-4 flex gap-1 z-10">
+                          <Button variant="secondary" size="icon" className="h-9 w-9 bg-white/90" onClick={() => setEditingPromo(promo)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/90 text-red-500" onClick={() => handleDelete(promo.id)}>
+                          <Button variant="secondary" size="icon" className="h-9 w-9 bg-white/90 text-red-500" onClick={() => handleDelete(promo.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -346,8 +346,8 @@ export default function PromotionsListPage() {
 
             {activePromotions.length === 0 && (
               <div className="text-center py-20 space-y-3">
-                <Ticket className="h-12 w-12 text-muted-foreground/20 mx-auto" />
-                <p className="text-sm text-muted-foreground italic">Hiện không có khuyến mãi nào</p>
+                <Ticket className="h-14 w-14 text-muted-foreground/20 mx-auto" />
+                <p className="text-base text-muted-foreground italic">Hiện không có khuyến mãi nào</p>
               </div>
             )}
           </div>

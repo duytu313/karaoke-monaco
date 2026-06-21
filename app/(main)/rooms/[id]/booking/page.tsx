@@ -174,7 +174,7 @@ export default function BookingPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border/30 bg-background/95 backdrop-blur-lg">
-        <div className="mx-auto flex max-w-md items-center gap-3 px-4 py-4">
+        <div className="mx-auto flex w-full items-center gap-3 px-4 py-4">
           <Link href={`/rooms/${id}`}>
             <Button variant="ghost" size="icon" className="shrink-0">
               <ArrowLeft className="h-5 w-5" />
@@ -186,7 +186,7 @@ export default function BookingPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-md space-y-6 px-4 py-4 pb-24">
+      <main className="mx-auto w-full space-y-6 px-4 py-4 pb-24">
         {/* Date Selection */}
         <section>
           <div className="mb-3 flex items-center justify-between">
@@ -267,7 +267,7 @@ export default function BookingPage() {
 
       {/* Bottom CTA */}
       <div className="fixed bottom-20 left-0 right-0 border-t border-border/30 bg-background/95 p-4 backdrop-blur-lg">
-        <div className="mx-auto max-w-md">
+        <div className="mx-auto w-full">
           <Button 
             className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
             disabled={visibleTimeSlots.length === 0}

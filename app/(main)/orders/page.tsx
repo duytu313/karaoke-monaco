@@ -152,16 +152,16 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
+      {/* Enhanced Header */}
       <header className="sticky top-0 z-40 border-b border-border/30 bg-background/95 backdrop-blur-lg">
-        <div className="mx-auto max-w-md px-4 py-4">
-          <h1 className="text-lg font-semibold text-foreground">Đơn của tôi</h1>
+        <div className="w-full px-5 py-5">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground">Đơn của tôi</h1>
         </div>
       </header>
 
-      <main className="mx-auto max-w-md space-y-4 px-4 py-4">
-        {/* Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 snap-x snap-mandatory">
+      <main className="mx-auto w-full space-y-[1cm] px-5 py-5">
+        {/* Enhanced Filters */}
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-5 px-5 snap-x snap-mandatory">
           {filters.map((filter) => (
             <Button
               key={filter}
@@ -169,7 +169,7 @@ export default function OrdersPage() {
               size="sm"
               onClick={() => setActiveFilter(filter)}
               className={cn(
-                "rounded-full border-border/50 shrink-0 snap-start",
+                "rounded-full border-border/50 shrink-0 snap-start text-sm",
                 activeFilter === filter
                   ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
                   : "bg-card hover:border-primary/50"
@@ -180,65 +180,65 @@ export default function OrdersPage() {
           ))}
         </div>
 
-        {/* Order List */}
-        <div className="space-y-6 flex flex-col">
+        {/* Enhanced Order List */}
+        <div className="space-y-[1cm] flex flex-col">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground italic">
-              <Loader2 className="h-8 w-8 animate-spin mb-2" />
-              Đang tải đơn hàng...
+              <Loader2 className="h-10 w-10 animate-spin mb-2" />
+              <p className="text-base">Đang tải đơn hàng...</p>
             </div>
           ) : filteredOrders.map((order) => {
             const status = getStatusLabel(order.status)
             return (
               <Link key={order.id} href={`/orders/${order.id}`}>
-                <Card className="border-border/50 bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md shadow-sm active:scale-[0.98]">
-                  <div className="flex gap-3">
+                <Card className="border-border/50 bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg shadow-sm active:scale-[0.98] min-h-[6cm]">
+                  <div className="flex gap-5">
                     <Image
                       src={order.image}
                       alt={order.room}
-                      width={80}
-                      height={80}
-                      className="h-20 w-20 shrink-0 rounded-lg object-cover"
+                      width={140}
+                      height={140}
+                      className="h-32 w-32 shrink-0 rounded-xl object-cover"
                     />
                     <div className="flex flex-1 flex-col justify-between">
                       <div>
-                        <h3 className="font-semibold text-foreground">
+                        <h3 className="font-bold text-xl text-foreground">
                           {order.room}
                         </h3>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-base text-muted-foreground">
                           {order.date} - {order.time}
                         </p>
-                        <div className="mt-1 flex items-center gap-2">
+                        <div className="mt-2 flex items-center gap-2">
                           <span
                             className={cn(
-                              "inline-block rounded px-2 py-0.5 text-xs font-medium",
+                              "inline-block rounded px-3 py-1 text-sm font-medium",
                               status.color
                             )}
                           >
                             {status.text}
                           </span>
                           <span className={cn(
-                            "flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded",
+                            "flex items-center gap-1.5 text-sm font-bold px-2 py-1 rounded",
                             order.status === "Đã thanh toán" && order.pointsEarned !== undefined ? "text-green-600 bg-green-600/10" : "text-accent bg-accent/10"
                           )}>
-                            <Sparkles className={cn("h-3 w-3", order.status !== "Đã thanh toán" && "animate-pulse")} />
+                            <Sparkles className={cn("h-4 w-4", order.status !== "Đã thanh toán" && "animate-pulse")} />
                             +{order.status === "Đã thanh toán" && order.pointsEarned !== undefined ? order.pointsEarned : order.points} điểm
                           </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {order.status === "Đã thanh toán" && order.paidAmount > 0 ? (
-                          <span className="font-bold text-green-600">
+                          <span className="font-bold text-lg text-green-600">
                             {formatPrice(order.paidAmount)}
                           </span>
                         ) : (
                           <>
                             {order.originalPrice !== order.finalPrice && (
-                              <span className="text-sm text-muted-foreground line-through">
+                              <span className="text-base text-muted-foreground line-through">
                                 {formatPrice(order.originalPrice)}
                               </span>
                             )}
-                            <span className="font-semibold text-primary">
+                            <span className="font-bold text-lg text-primary">
                               {formatPrice(order.finalPrice)}
                             </span>
                           </>
@@ -252,7 +252,7 @@ export default function OrdersPage() {
           })}
 
           {!loading && error && (
-            <div className="py-10 text-center text-red-500 text-sm italic">
+            <div className="py-10 text-center text-red-500 text-base italic">
               {error}
             </div>
           )}
@@ -260,17 +260,17 @@ export default function OrdersPage() {
 
         {!loading && !error && filteredOrders.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-in fade-in zoom-in duration-500">
-            <div className="h-24 w-24 rounded-full bg-primary/5 flex items-center justify-center mb-6 shadow-inner">
-              <Sparkles className="h-12 w-12 text-primary/20" />
+            <div className="h-28 w-28 rounded-full bg-primary/5 flex items-center justify-center mb-6 shadow-inner">
+              <Sparkles className="h-14 w-14 text-primary/20" />
             </div>
-            <h3 className="text-base font-bold text-foreground mb-2">Chưa có đơn hàng nào</h3>
-            <p className="text-xs text-muted-foreground italic leading-relaxed mb-8 max-w-[200px]">
+            <h3 className="text-xl font-bold text-foreground mb-3">Chưa có đơn hàng nào</h3>
+            <p className="text-base text-muted-foreground italic leading-relaxed mb-8 max-w-[280px]">
               {activeFilter === "Tất cả" 
                 ? "Bạn vẫn chưa có lịch hẹn nào. Hãy khám phá các dịch vụ đẳng cấp của chúng tôi ngay!" 
                 : `Không tìm thấy đơn hàng nào ở trạng thái "${activeFilter}".`}
             </p>
             <Link href="/rooms">
-              <Button className="bg-accent text-accent-foreground font-bold rounded-xl px-8 shadow-lg shadow-accent/20 active:scale-95 transition-all">
+              <Button className="bg-accent text-accent-foreground font-bold rounded-xl px-8 py-6 text-base shadow-lg shadow-accent/20 active:scale-95 transition-all">
                 Đặt lịch ngay
               </Button>
             </Link>

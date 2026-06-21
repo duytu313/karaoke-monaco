@@ -69,7 +69,7 @@ export default function PromotionDetailPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       {/* Header Image */}
       <div className="relative p-4 shrink-0">
         <div className="relative h-64 w-full overflow-hidden rounded-3xl shadow-xl">

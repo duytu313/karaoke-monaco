@@ -31,7 +31,7 @@ export async function PATCH(request: Request) {
       // Xác nhận sử dụng thưởng
       await rtdb.ref(`users/profiles/${userKey}/rewardVault/${rewardId}`).update({
         status: "used",
-        usedAt: admin.database.ServerValue.TIMESTAMP,
+        usedAt: Date.now(),
       });
 
       // Thông báo cho user
@@ -42,7 +42,7 @@ export async function PATCH(request: Request) {
         href: "/orders",
         type: "system",
         time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
         read: false,
       });
     } else {
@@ -61,7 +61,7 @@ export async function PATCH(request: Request) {
         href: "/wallet/reward-vault",
         type: "system",
         time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
         read: false,
       });
     }

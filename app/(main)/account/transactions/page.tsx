@@ -78,7 +78,7 @@ export default function TransactionHistoryPage() {
     .reduce((sum, t) => sum + t.amount, 0)
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
@@ -91,7 +91,7 @@ export default function TransactionHistoryPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 space-y-4 pb-24">
+      <main className="flex-1 p-4 space-y-[1cm] pb-24">
         {/* Tìm kiếm & Lọc */}
         <div className="flex gap-2">
           <div className="relative flex-1">
@@ -109,7 +109,7 @@ export default function TransactionHistoryPage() {
         </div>
 
         {/* Danh sách giao dịch */}
-        <div className="space-y-1">
+        <div className="space-y-[1cm]">
           <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1 mb-2">Giao dịch gần đây</h2>
           {loading ? (
             <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" /></div>

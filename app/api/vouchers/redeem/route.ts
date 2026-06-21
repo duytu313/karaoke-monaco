@@ -66,14 +66,14 @@ async function sendRedeemNotification(
 ) {
   if (!userId || userId === "guest") return;
 
-  const notifRef = rtdb.ref(`notifications/personal/${userId}`).push();
+    const notifRef = rtdb.ref(`notifications/personal/${userId}`).push();
   await notifRef.set({
     title,
     description,
     href,
     type: "system",
     time: "Mới đây",
-    createdAt: admin.database.ServerValue.TIMESTAMP,
+    createdAt: Date.now(),
     read: false,
   });
 }
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
       discountRate: voucher.discountRate || null,
       serviceType: voucher.serviceType,
       pointsUsed: voucher.pointsCost,
-      redeemedAt: admin.database.ServerValue.TIMESTAMP,
+      redeemedAt: Date.now(),
       used: false,
       usedAt: null,
     };
@@ -151,7 +151,7 @@ export async function POST(request: Request) {
       type: "spend",
       voucherCode: voucher.code,
       points: -voucher.pointsCost,
-      timestamp: admin.database.ServerValue.TIMESTAMP,
+      timestamp: Date.now(),
       description: `Đổi voucher "${voucher.title}"`,
     });
 

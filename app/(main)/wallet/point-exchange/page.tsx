@@ -206,7 +206,7 @@ export default function PointExchangePage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Link href="/wallet">
@@ -221,7 +221,7 @@ export default function PointExchangePage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 space-y-6 pb-24">
+      <main className="flex-1 p-4 space-y-[1cm] pb-24">
         {/* Thông báo */}
         {message && (
           <div className={cn(
@@ -260,7 +260,7 @@ export default function PointExchangePage() {
             <h2 className="text-xs font-bold uppercase tracking-widest text-foreground">Phần thưởng có thể đổi</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-[1cm]">
             {availableRewards.map((reward) => {
               const canAfford = (user?.points || 0) >= reward.pointsCost
               return (

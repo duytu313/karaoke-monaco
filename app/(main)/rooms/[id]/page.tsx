@@ -130,7 +130,7 @@ export default function RoomDetailPage() {
   const DescriptionIcon = serviceTypeIcons[room.serviceType] || Mic2
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       {/* Header Image - Contained style like Home */}
       <div className="relative p-4">
         <div className="relative h-64 w-full overflow-hidden rounded-3xl shadow-xl">
@@ -178,7 +178,7 @@ export default function RoomDetailPage() {
       </div>
 
       {/* Content */}
-      <main className="mx-auto max-w-md px-4 pb-24">
+      <main className="mx-auto w-full px-4 pb-24">
         <div className="mt-2 relative">
           {/* Room Info */}
           <Card className="border-border/50 bg-card p-4">
@@ -241,7 +241,7 @@ export default function RoomDetailPage() {
 
       {/* Bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 border-t border-border/30 bg-background/95 p-4 backdrop-blur-lg">
-        <div className="mx-auto max-w-md">
+        <div className="mx-auto w-full">
           <Link href={`/rooms/${room.id}/booking`}>
             <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
               Đặt {room.name} ngay

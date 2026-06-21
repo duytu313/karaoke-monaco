@@ -50,21 +50,21 @@ const rooms: Room[] = [
 export default function RoomsPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
-        <div className="mx-auto max-w-md px-4 py-4">
-          <h1 className="text-xl font-bold text-foreground">Tất cả dịch vụ</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Chọn dịch vụ bạn muốn đặt lịch</p>
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg">
+        <div className="app-container py-5">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground">Tất cả dịch vụ</h1>
+          <p className="text-lg text-muted-foreground mt-1">Chọn dịch vụ bạn muốn đặt lịch</p>
         </div>
       </header>
 
-      <main className="mx-auto max-w-md px-4 py-6 space-y-5">
+      <main className="app-container py-6 space-y-[1cm]">
         {rooms.map((room) => {
           const Icon = serviceIcons[room.type] || Mic2;
           return (
             <Link key={room.id} href={`/rooms/${room.id}`} className="block group">
-              <div className="flex gap-4 border-2 border-primary/30 p-4 rounded-xl bg-card transition-all duration-300 hover:border-primary/50 hover:shadow-lg active:scale-[0.98]">
+              <div className="flex gap-5 border border-border/50 bg-card p-4 rounded-xl transition-all duration-300 hover:border-primary/50 hover:shadow-xl active:scale-[0.98] min-h-[6cm]">
                 {/* Ảnh bên trái */}
-                <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl">
+                <div className="relative h-52 w-52 sm:h-60 sm:w-60 shrink-0 overflow-hidden rounded-xl">
                   <Image 
                     src={room.image} 
                     alt={room.name} 
@@ -73,20 +73,20 @@ export default function RoomsPage() {
                   />
                 </div>
                 {/* Nội dung bên phải */}
-                <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-foreground text-base">{room.name}</h4>
-                    <span className="bg-primary/10 text-primary text-[11px] px-2 py-0.5 rounded-full font-bold shrink-0 flex items-center gap-1">
-                      <Icon className="h-3.5 w-3.5" /> {room.category}
+                <div className="flex flex-col justify-center min-w-0 flex-1 gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <h4 className="font-bold text-foreground text-xl sm:text-2xl shrink-0">{room.name}</h4>
+                    <span className="bg-primary/10 text-primary text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full font-bold shrink-0 flex items-center gap-1.5 max-w-[50%] sm:max-w-none overflow-hidden text-ellipsis whitespace-nowrap">
+                      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> <span className="truncate">{room.category}</span>
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                      <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     ))}
-                    <span className="text-xs text-muted-foreground ml-0.5">4.8</span>
+                    <span className="text-sm text-muted-foreground ml-1">4.8</span>
                   </div>
-                  <span className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                  <span className="text-lg font-medium text-muted-foreground group-hover:text-primary transition-colors">
                     Xem chi tiết →
                   </span>
                 </div>

@@ -23,7 +23,7 @@ export default function SettingsPage() {
   const currentLang = "vi"
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
           <Link href="/account">
@@ -35,66 +35,66 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 space-y-8 mt-4">
-        <section className="space-y-2">
+      <main className="flex-1 p-4 space-y-[1cm] mt-4">
+        <section className="space-y-[1cm]">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1">Giao diện & Ngôn ngữ</p>
           <Card className="divide-y divide-border/30 border-border/50 overflow-hidden shadow-sm">
-            <div className="flex items-center justify-between px-4 h-14 bg-card">
+            <div className="flex items-center justify-between px-4 h-20 bg-card">
               <div className="flex items-center gap-4">
-                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                  <Moon className="h-5 w-5" />
+                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Moon className="h-7 w-7" />
                 </div>
-                <span className="font-bold text-base text-foreground">Chế độ tối</span>
+                <span className="font-bold text-lg text-foreground">Chế độ tối</span>
               </div>
               <Switch checked={theme === "dark"} onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} />
             </div>
-            <Link href="/account/settings/language" className="flex items-center gap-4 px-4 h-14 bg-card active:bg-muted/50 transition-all">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <Globe className="h-5 w-5" />
+            <Link href="/account/settings/language" className="flex items-center gap-4 px-4 h-20 bg-card active:bg-muted/50 transition-all">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <Globe className="h-7 w-7" />
               </div>
-              <span className="flex-1 font-bold text-base text-foreground">Ngôn ngữ</span>
-              <span className="text-sm text-muted-foreground">{languageNames[currentLang]}</span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+              <span className="flex-1 font-bold text-lg text-foreground">Ngôn ngữ</span>
+              <span className="text-base text-muted-foreground">{languageNames[currentLang]}</span>
+              <ChevronRight className="h-6 w-6 text-muted-foreground/30" />
             </Link>
           </Card>
         </section>
 
-        <section className="space-y-2">
+        <section className="space-y-[1cm]">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1">Bảo mật</p>
           <Card className="divide-y divide-border/30 border-border/50 overflow-hidden shadow-sm">
-            <Link href="/account/settings/change-password" title="Đổi mật khẩu" className="flex items-center gap-4 px-4 h-14 bg-card active:bg-muted/50 transition-all">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <Lock className="h-5 w-5" />
+            <Link href="/account/settings/change-password" title="Đổi mật khẩu" className="flex items-center gap-4 px-4 h-20 bg-card active:bg-muted/50 transition-all">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <Lock className="h-7 w-7" />
               </div>
-              <span className="flex-1 font-bold text-base text-foreground">Đổi mật khẩu</span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+              <span className="flex-1 font-bold text-lg text-foreground">Đổi mật khẩu</span>
+              <ChevronRight className="h-6 w-6 text-muted-foreground/30" />
             </Link>
-            <Link href="/account/settings/privacy" className="flex items-center gap-4 px-4 h-14 bg-card active:bg-muted/50 transition-all">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <Shield className="h-5 w-5" />
+            <Link href="/account/settings/privacy" className="flex items-center gap-4 px-4 h-20 bg-card active:bg-muted/50 transition-all">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <Shield className="h-7 w-7" />
               </div>
-              <span className="flex-1 font-bold text-base text-foreground">Quyền riêng tư</span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+              <span className="flex-1 font-bold text-lg text-foreground">Quyền riêng tư</span>
+              <ChevronRight className="h-6 w-6 text-muted-foreground/30" />
             </Link>
           </Card>
         </section>
 
-        <section className="space-y-2 pb-10">
+        <section className="space-y-[1cm] pb-10">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1">Thông tin ứng dụng</p>
           <Card className="divide-y divide-border/30 border-border/50 overflow-hidden shadow-sm">
-            <Link href="/account/settings/help" className="flex items-center gap-4 px-4 h-14 bg-card active:bg-muted/50 transition-all">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <HelpCircle className="h-5 w-5" />
+            <Link href="/account/settings/help" className="flex items-center gap-4 px-4 h-20 bg-card active:bg-muted/50 transition-all">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <HelpCircle className="h-7 w-7" />
               </div>
-              <span className="flex-1 font-bold text-base text-foreground">Hỗ trợ</span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+              <span className="flex-1 font-bold text-lg text-foreground">Hỗ trợ</span>
+              <ChevronRight className="h-6 w-6 text-muted-foreground/30" />
             </Link>
-            <Link href="/account/settings/terms" className="flex items-center gap-4 px-4 h-14 bg-card active:bg-muted/50 transition-all">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <FileText className="h-5 w-5" />
+            <Link href="/account/settings/terms" className="flex items-center gap-4 px-4 h-20 bg-card active:bg-muted/50 transition-all">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <FileText className="h-7 w-7" />
               </div>
-              <span className="flex-1 font-bold text-base text-foreground">Điều khoản sử dụng</span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+              <span className="flex-1 font-bold text-lg text-foreground">Điều khoản sử dụng</span>
+              <ChevronRight className="h-6 w-6 text-muted-foreground/30" />
             </Link>
           </Card>
         </section>

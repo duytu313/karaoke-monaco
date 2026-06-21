@@ -42,7 +42,7 @@ export default function IntroPage() {
   }, [api])
 
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-slate-950/5 dark:bg-slate-950/40 relative overflow-hidden border-x border-border/10">
+    <main className="min-h-screen w-full bg-slate-950/5 dark:bg-slate-950/40 relative overflow-hidden">
       {/* Background Carousel - Trượt ngang và hỗ trợ vuốt */}
       <Carousel 
         setApi={setApi} 
@@ -81,27 +81,27 @@ export default function IntroPage() {
         </div>
 
         {/* Slide Content */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white leading-tight whitespace-pre-line">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white leading-tight whitespace-pre-line">
             Trải nghiệm{"\n"}đẳng cấp khác biệt
           </h1>
-          <p className="text-slate-200/90 mt-4 text-sm leading-relaxed max-w-xl">
+          <p className="text-slate-200/90 mt-4 text-lg leading-relaxed max-w-2xl">
             Hệ thống giải trí hàng đầu với Karaoke, Massage, Nhà hàng sang trọng bậc nhất.
           </p>
         </div>
 
         {/* Buttons */}
-        <div className="space-y-3 pointer-events-auto">
+        <div className="space-y-4 pointer-events-auto">
           <Button
             asChild
             variant="outline"
-            className="w-full h-14 text-base font-medium border-white text-white bg-white/10 hover:bg-white/20 rounded-lg"
+            className="w-full h-16 text-lg font-medium border-white text-white bg-white/10 hover:bg-white/20 rounded-xl"
           >
             <Link href="/login">Đăng nhập</Link>
           </Button>
           <Button
             asChild
-            className="w-full h-14 text-base font-medium bg-amber-400 hover:bg-amber-300 text-slate-950 border-amber-400 rounded-lg shadow-xl shadow-amber-500/20"
+            className="w-full h-16 text-lg font-bold bg-amber-400 hover:bg-amber-300 text-slate-950 border-amber-400 rounded-xl shadow-xl shadow-amber-500/20"
           >
             <Link href="/register">Đăng ký</Link>
           </Button>

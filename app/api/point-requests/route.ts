@@ -49,7 +49,7 @@ async function sendPointExchangeNotification(
     href,
     type: "system",
     time: "Mới đây",
-    createdAt: admin.database.ServerValue.TIMESTAMP,
+    createdAt: Date.now(),
     read: false,
   });
 }
@@ -110,19 +110,19 @@ export async function POST(request: Request) {
       description: description || catalogReward.description,
       date: dateStr,
       status: "pending",
-      createdAt: admin.database.ServerValue.TIMESTAMP,
+      createdAt: Date.now(),
     });
 
     // Gửi thông báo cho admin
     const adminNotifRef = rtdb.ref("notifications/global").push();
-    await adminNotifRef.set({
-      title: "Yêu cầu đổi điểm mới",
-      description: `${customerName || "Khách hàng"} yêu cầu đổi "${catalogReward.title}" (${catalogReward.pointsCost.toLocaleString("vi-VN")} điểm)`,
-      href: "/dashboard/point-requests",
-      type: "system",
-      time: "Mới đây",
-      createdAt: admin.database.ServerValue.TIMESTAMP,
-    });
+  await adminNotifRef.set({
+    title: "Yêu cầu đổi điểm mới",
+    description: `${customerName || "Khách hàng"} yêu cầu đổi "${catalogReward.title}" (${catalogReward.pointsCost.toLocaleString("vi-VN")} điểm)`,
+    href: "/dashboard/point-requests",
+    type: "system",
+    time: "Mới đây",
+    createdAt: Date.now(),
+  });
 
     await sendPointExchangeNotification(
       userId,

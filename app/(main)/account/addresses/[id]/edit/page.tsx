@@ -49,7 +49,9 @@ export default function EditAddressPage() {
 
     try {
       const updates: Record<string, any> = {
-        [`
+        [`users/profiles/${userKey}/addresses/${params.id}/type`]: type,
+        [`users/profiles/${userKey}/addresses/${params.id}/address`]: address,
+        [`users/profiles/${userKey}/addresses/${params.id}/isDefault`]: isDefault,
       }
 
       if (isDefault) {
@@ -82,7 +84,7 @@ export default function EditAddressPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
         <div className="flex items-center gap-3 px-4 py-4">
@@ -161,7 +163,7 @@ export default function EditAddressPage() {
           <Button 
             variant="ghost" 
             className="w-full justify-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 h-12 rounded-xl border border-dashed border-red-200"
-            onClick={() => router.push("/account/addresses")}
+            onClick={handleDelete}
           >
             <Trash2 className="h-4 w-4" />
             <span className="font-bold text-sm">Xóa địa chỉ này</span>

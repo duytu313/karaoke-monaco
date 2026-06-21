@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       pointsEarned: pointsToAdd,
       finalAmount: finalAmount,
       paidAmount: finalAmount,
-      completedAt: admin.database.ServerValue.TIMESTAMP
+      completedAt: Date.now(),
     });
 
     if (userId && userId !== "guest") {
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
           type: "earn",
           bookingId,
           points: pointsToAdd,
-          timestamp: admin.database.ServerValue.TIMESTAMP,
+          timestamp: Date.now(),
           description: `Tích điểm từ đơn hàng #${bookingId} (${new Intl.NumberFormat("vi-VN").format(finalAmount)}đ)`,
         })
       }
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
         href: `/orders/${bookingId}`,
         type: "order", // Consistent with admin API
         time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
         read: false,
       })
 
@@ -105,7 +105,7 @@ export async function POST(request: Request) {
         href: "/wallet", // Consistent with admin API
         type: "system",
         time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
         read: false,
       })
     } else {

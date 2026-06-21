@@ -104,7 +104,7 @@ export default function ProfilePage() {
   const handleAvatarClick = () => fileInputRef.current?.click()
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       {/* Header */}
       <header className="relative overflow-hidden p-6 pb-4">
         {/* Decorative background elements like Account page */}

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     const updateData: Record<string, any> = { status: normalizedStatus };
     const timeField = statusTimeField[normalizedStatus];
     if (timeField) {
-      updateData[timeField] = admin.database.ServerValue.TIMESTAMP;
+      updateData[timeField] = Date.now();
     }
 
     // Cập nhật status
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
           href: `/orders/${bookingId}`,
           type: "order",
           time: "Mới đây",
-          createdAt: admin.database.ServerValue.TIMESTAMP,
+          createdAt: Date.now(),
           read: false,
         });
       }

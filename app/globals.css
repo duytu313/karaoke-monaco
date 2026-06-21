@@ -121,5 +121,51 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 16px;
   }
+}
+
+/* Larger base typography for better readability */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Enhanced card and component sizing */
+.card-enhanced {
+  @apply p-6 rounded-2xl;
+}
+
+.text-display {
+  @apply text-2xl font-bold;
+}
+
+.text-heading {
+  @apply text-xl font-semibold;
+}
+
+.text-body {
+  @apply text-base;
+}
+
+.text-small {
+  @apply text-sm;
+}
+
+/* ===== RESPONSIVE LAYOUT ===== */
+/* ALL devices: full 100% width, no phone frame */
+.app-screen {
+  width: 100%;
+  min-height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: hidden;
+}
+
+.app-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }

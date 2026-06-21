@@ -122,7 +122,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
+    <main className="min-h-screen w-full bg-background flex flex-col">
       {/* Header */}
       <header className="pt-6 px-6">
         <Link
@@ -135,8 +135,8 @@ export default function RegisterPage() {
       </header>
 
       <div className="pt-8 pb-8 px-6">
-        <h1 className="text-2xl font-bold text-center text-foreground">Đăng ký tài khoản</h1>
-        <p className="text-sm text-muted-foreground text-center mt-2">
+        <h1 className="text-4xl font-bold text-center text-foreground">Đăng ký tài khoản</h1>
+        <p className="text-lg text-muted-foreground text-center mt-2">
           Tạo tài khoản để nhận nhiều ưu đãi hấp dẫn từ Monaco
         </p>
       </div>
@@ -254,9 +254,9 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg mt-2"
+            className="w-full h-16 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl mt-2"
           >
-            {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {isLoading && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
             {isLoading ? "Đang xử lý..." : "Đăng ký"}
           </Button>
         </form>

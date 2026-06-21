@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       guestCount: typeof guestCount === "number" ? guestCount : 1,
       guests: typeof guestCount === "number" ? guestCount : 1, // Lưu cả 2 field
       status: "Chờ xác nhận",
-      createdAt: admin.database.ServerValue.TIMESTAMP,
+      createdAt: Date.now(),
     };
 
     // Lưu thông tin voucher/ưu đãi nếu có
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
         const userKey = uidSnapshot.val();
         await rtdb.ref(`users/profiles/${userKey}/rewardVault/${appliedRewardId}`).update({ 
           status: "pending_use", 
-          reservedAt: admin.database.ServerValue.TIMESTAMP,
+          reservedAt: Date.now(),
           bookingId: newBookingRef.key 
         });
       }
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         href: `/orders/${newBookingRef.key}`,
         type: "order",
         time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
         read: false,
       });
 
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
         href: `/dashboard/bookings`,
         type: "order",
         time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
+        createdAt: Date.now(),
       });
     }
 

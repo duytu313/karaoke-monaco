@@ -107,7 +107,7 @@ export async function POST(request: Request) {
           type: "task",
           taskId: task.id,
           points: task.points,
-          timestamp: admin.database.ServerValue.TIMESTAMP,
+          timestamp: Date.now(),
           description: `Hoàn thành nhiệm vụ "${task.title}"`,
         });
 
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
           href: "/wallet/tasks",
           type: "system",
           time: "Mới đây",
-          createdAt: admin.database.ServerValue.TIMESTAMP,
+          createdAt: Date.now(),
           read: false,
         });
 

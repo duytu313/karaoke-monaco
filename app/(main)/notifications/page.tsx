@@ -110,27 +110,27 @@ export default function NotificationsPage() {
   ].sort((a, b) => b.createdAt - a.createdAt)
 
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background flex flex-col border-x border-border/10">
-      {/* Header */}
+    <div className="min-h-screen w-full bg-background flex flex-col">
+      {/* Enhanced Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/30">
-        <div className="flex items-center gap-3 px-4 py-4">
+        <div className="flex items-center gap-4 px-5 py-5">
           <Link href="/home">
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-foreground hover:bg-accent/50">
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full text-foreground hover:bg-accent/50">
+              <ArrowLeft className="h-6 w-6" />
             </Button>
           </Link>
-          <h1 className="text-lg font-semibold text-foreground">Thông báo</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Thông báo</h1>
         </div>
       </header>
 
-      <main className="mx-auto max-w-md px-4 py-6 pb-24">
-        <div className="space-y-6 flex flex-col">
+      <main className="mx-auto w-full px-5 py-6 pb-24">
+        <div className="space-y-[1cm] flex flex-col">
           {isLoading ? (
-            <div className="rounded-2xl border border-border/50 bg-card p-6 text-center text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-border/50 bg-card p-8 text-center text-base text-muted-foreground">
               Đang tải thông báo...
             </div>
           ) : notifications.length === 0 ? (
-            <div className="rounded-2xl border border-border/50 bg-card p-6 text-center text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-border/50 bg-card p-8 text-center text-base text-muted-foreground">
               Hiện không có thông báo mới.
             </div>
           ) : (
@@ -138,20 +138,20 @@ export default function NotificationsPage() {
               const Icon = iconMap[notification.type] || Info
               return (
                 <Link key={notification.id} href={`/notifications/${notification.id}?source=${notification.source || "global"}`}>
-                  <Card className="flex items-start gap-4 border-border/50 p-4 transition-all hover:border-primary/40 hover:bg-primary/5 active:scale-[0.99] shadow-sm">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 shrink-0 mt-0.5">
-                      <Icon className="h-5 w-5 text-primary" />
+                  <Card className="flex items-start gap-5 border-border/50 p-5 transition-all hover:border-primary/40 hover:bg-primary/5 active:scale-[0.99] shadow-sm">
+                    <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-primary/10 shrink-0 mt-0.5">
+                      <Icon className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
                     </div>
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold text-foreground">
+                        <h3 className="text-lg sm:text-xl font-bold text-foreground">
                           {notification.title}
                         </h3>
-                        <span className="text-[10px] text-muted-foreground font-medium">
+                        <span className="text-xs text-muted-foreground font-medium">
                           {notification.time}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
+                      <p className="text-base text-muted-foreground leading-relaxed">
                         {notification.description}
                       </p>
                     </div>

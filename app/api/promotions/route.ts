@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     const id = slugify(title) + "-" + Date.now().toString(36);
-    const now = admin.database.ServerValue.TIMESTAMP;
+    const now = Date.now();
 
     await rtdb.ref(`news/${id}`).set({
       title,
@@ -83,7 +83,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ message: "Không tìm thấy khuyến mãi" }, { status: 404 });
     }
 
-    const updateData: Record<string, any> = { updatedAt: admin.database.ServerValue.TIMESTAMP };
+    const updateData: Record<string, any> = { updatedAt: Date.now() };
     if (title !== undefined) updateData.title = title;
     if (subtitle !== undefined) updateData.subtitle = subtitle;
     if (content !== undefined) updateData.content = content;
