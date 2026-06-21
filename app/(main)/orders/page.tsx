@@ -8,10 +8,11 @@ import { Sparkles, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useAuth } from "@/context/AuthContext"
-import { fetchUserBookings } from "@/lib/rtdb-utils"
+import { rtdb } from "@/lib/firebase"
+import { ref, onValue, query, orderByChild, equalTo } from "firebase/database"
 import { BookingStatus } from "@/lib/database-schema"
 
-const filters = ["Tất cả", "Chờ xác nhận", "Đã xác nhận", "Đang dùng", "Đã thanh toán", "Đã hủy"]
+const filters = ["Tất cả", "Chờ xác nhận", "Đã xác nhận", "Đã đến", "Đang dùng", "Đã thanh toán", "Đã hủy"]
 
 const roomMapping: Record<string, any> = {
   karaoke: { name: "Karaoke VIP", image: "/images/vip1.jpg" },
@@ -27,8 +28,12 @@ interface Order {
   status: BookingStatus
   originalPrice: number
   finalPrice: number
+  paidAmount: number
   image: string
   points: number
+  pointsEarned?: number // Thêm trường này để lưu điểm đã tích lũy thực tế
+  hasVoucher: boolean
+  hasReward: boolean
 }
 
 function formatPrice(price: number) {
@@ -42,6 +47,8 @@ function getStatusLabel(status: string) {
       return { text: "Chờ xác nhận", color: "bg-yellow-500/20 text-yellow-500" }
     case "Đã xác nhận":
       return { text: "Đã xác nhận", color: "bg-blue-500/20 text-blue-500" }
+    case "Đã đến":
+      return { text: "Đã đến", color: "bg-cyan-500/20 text-cyan-500" }
     case "Đang dùng":
       return { text: "Đang sử dụng", color: "bg-purple-500/20 text-purple-500" }
     case "Đã thanh toán":
@@ -61,47 +68,82 @@ export default function OrdersPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!user?.uid) {
-        setOrders([])
-        return
-      }
+    if (!user?.uid) {
+      setOrders([])
+      setLoading(false)
+      return
+    }
+
+    const bookingsRef = query(
+      ref(rtdb, 'bookings'),
+      orderByChild('userId'),
+      equalTo(user.uid)
+    )
+
+    const unsubscribe = onValue(bookingsRef, (snapshot) => {
       try {
-        const bookings = await fetchUserBookings(user.uid)
-        const fetchedOrders = bookings
-          ? Object.entries(bookings as Record<string, any>).map(([key, data]) => {
-              const roomInfo = roomMapping[data.type] || roomMapping.karaoke
-              return {
-                id: key,
-                room: roomInfo.name,
-                date: data.bookingDate,
-                time: data.bookingTime,
-                status: ((data.status === "pending" ? "Chờ xác nhận" : data.status) || "Chờ xác nhận") as BookingStatus,
-                originalPrice: data.totalAmount,
-                finalPrice: data.totalAmount,
-                image: roomInfo.image,
-                points: Math.floor(data.totalAmount / 10000),
-                createdAt: data.createdAt || 0,
+        if (snapshot.exists()) {
+          const data = snapshot.val()
+          const fetchedOrders = Object.entries(data).map(([key, val]: [string, any]) => {
+            const roomInfo = roomMapping[val.type] || roomMapping.karaoke
+            const roomPrice = Number(val.totalEst || val.roomPrice || 0)
+            const services = val.services || val.items || []
+            const svcTotal = services.reduce((sum: number, s: any) => sum + (s.price * (s.quantity || s.qty || 1)), 0)
+            const paidAmount = Number(val.paidAmount || 0)
+            
+            // Đồng bộ cách tính subtotal với Admin để hiển thị điểm chính xác
+            const subtotal = Math.max(roomPrice + svcTotal, paidAmount, Number(val.totalAmount || 0))
+            
+            let voucherDiscount = 0
+            if (val.appliedVoucher) {
+              if (val.appliedVoucher.discountAmount) {
+                voucherDiscount = Math.min(val.appliedVoucher.discountAmount, subtotal)
+              } else if (val.appliedVoucher.discountRate) {
+                voucherDiscount = Math.floor(subtotal * val.appliedVoucher.discountRate)
               }
-            })
-            .sort((a, b) => b.createdAt - a.createdAt)
-          : []
-        setOrders(fetchedOrders)
+            }
+            
+            const rewardDiscount = Number(val.appliedRewardDiscount || 0)
+            const clientComputedFinalAmount = Math.max(0, subtotal - voucherDiscount - rewardDiscount)
+            const finalAmountForDisplay = Number(val.finalAmount || clientComputedFinalAmount)
+
+            return {
+              id: key,
+              room: roomInfo.name,
+              date: val.bookingDate,
+              time: val.bookingTime,
+              status: ((val.status === "pending" ? "Chờ xác nhận" : val.status) || "Chờ xác nhận") as BookingStatus,
+              originalPrice: subtotal,
+              finalPrice: finalAmountForDisplay,
+              paidAmount: Number(val.paidAmount || 0),
+              image: roomInfo.image,
+              points: isNaN(finalAmountForDisplay) || finalAmountForDisplay <= 0 ? 0 : Math.floor(finalAmountForDisplay / 10000),
+              pointsEarned: val.pointsEarned,
+              hasVoucher: !!val.appliedVoucher,
+              hasReward: !!val.appliedRewardId,
+              createdAt: val.createdAt || 0,
+            }
+          }).sort((a, b) => b.createdAt - a.createdAt)
+          setOrders(fetchedOrders)
+        } else {
+          setOrders([])
+        }
       } catch (error) {
-        console.error("Error fetching orders:", error)
-        setError("Không thể tải danh sách đơn hàng. Vui lòng kiểm tra kết nối mạng hoặc quyền truy cập RTDB.")
+        console.error("Error syncing orders:", error)
+        setError("Lỗi đồng bộ dữ liệu.")
       } finally {
         setLoading(false)
       }
-    }
+    })
 
-    fetchOrders()
+    return () => unsubscribe()
   }, [user?.uid])
 
   const filteredOrders = orders.filter((order) => {
     if (activeFilter === "Tất cả") return true
     if (activeFilter === "Chờ xác nhận") return order.status === "Chờ xác nhận"
     if (activeFilter === "Đã xác nhận") return order.status === "Đã xác nhận"
+    if (activeFilter === "Đã đến") return order.status === "Đã đến"
     if (activeFilter === "Đang dùng") return order.status === "Đang dùng"
     if (activeFilter === "Đã thanh toán") return order.status === "Đã thanh toán"
     if (activeFilter === "Đã hủy") return order.status === "Đã hủy"
@@ -175,21 +217,32 @@ export default function OrdersPage() {
                           >
                             {status.text}
                           </span>
-                          <span className="flex items-center gap-1 text-[11px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded">
-                            <Sparkles className="h-3 w-3 animate-pulse" />
-                            +{order.points} điểm
+                          <span className={cn(
+                            "flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded",
+                            order.status === "Đã thanh toán" && order.pointsEarned !== undefined ? "text-green-600 bg-green-600/10" : "text-accent bg-accent/10"
+                          )}>
+                            <Sparkles className={cn("h-3 w-3", order.status !== "Đã thanh toán" && "animate-pulse")} />
+                            +{order.status === "Đã thanh toán" && order.pointsEarned !== undefined ? order.pointsEarned : order.points} điểm
                           </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {order.originalPrice !== order.finalPrice && (
-                          <span className="text-sm text-muted-foreground line-through">
-                            {formatPrice(order.originalPrice)}
+                        {order.status === "Đã thanh toán" && order.paidAmount > 0 ? (
+                          <span className="font-bold text-green-600">
+                            {formatPrice(order.paidAmount)}
                           </span>
+                        ) : (
+                          <>
+                            {order.originalPrice !== order.finalPrice && (
+                              <span className="text-sm text-muted-foreground line-through">
+                                {formatPrice(order.originalPrice)}
+                              </span>
+                            )}
+                            <span className="font-semibold text-primary">
+                              {formatPrice(order.finalPrice)}
+                            </span>
+                          </>
                         )}
-                        <span className="font-semibold text-primary">
-                          {formatPrice(order.finalPrice)}
-                        </span>
                       </div>
                     </div>
                   </div>

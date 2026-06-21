@@ -4,15 +4,32 @@ import { rtdb, admin } from "@/lib/firebaseAdmin";
 export async function POST(request: Request) {
   try {
     const { bookingId, userId, status } = await request.json();
+    const normalizedStatus = status === "pending"
+      ? "Chờ xác nhận"
+      : status === "Đang sử dụng"
+        ? "Đang dùng"
+        : status;
 
-    if (!bookingId || !userId || !status) {
+    if (!bookingId || !normalizedStatus) {
       return NextResponse.json({ message: "Thiếu thông tin" }, { status: 400 });
     }
 
+    const bookingSnapshot = await rtdb.ref(`bookings/${bookingId}`).once("value");
+    const bookingData = bookingSnapshot.exists() ? bookingSnapshot.val() : null;
+    const targetUserId = bookingData?.userId || userId;
+
     const notificationConfig: Record<string, { title: string; description: string }> = {
+      "Chờ xác nhận": {
+        title: "Đơn hàng đang chờ xác nhận",
+        description: `Đơn hàng #${bookingId.slice(-6)} của bạn đã được tạo và đang chờ Monaco xác nhận.`,
+      },
       "Đã xác nhận": {
         title: "Đơn hàng đã được xác nhận",
         description: `Đơn hàng #${bookingId.slice(-6)} của bạn đã được xác nhận. Chúng tôi sẽ phục vụ bạn trong thời gian sớm nhất!`,
+      },
+      "Đã đến": {
+        title: "Khách đã đến",
+        description: `Đơn hàng #${bookingId.slice(-6)} đã được ghi nhận là khách đã đến. Monaco sẽ sắp xếp dịch vụ ngay cho bạn.`,
       },
       "Đang dùng": {
         title: "Bắt đầu dịch vụ",
@@ -28,13 +45,13 @@ export async function POST(request: Request) {
       },
     };
 
-    const config = notificationConfig[status];
+    const config = notificationConfig[normalizedStatus];
     if (!config) {
       return NextResponse.json({ message: "Trạng thái không hợp lệ" }, { status: 400 });
     }
 
-    if (userId && userId !== "guest") {
-      const notificationRef = rtdb.ref(`notifications/personal/${userId}`).push();
+    if (targetUserId && targetUserId !== "guest") {
+      const notificationRef = rtdb.ref(`notifications/personal/${targetUserId}`).push();
       await notificationRef.set({
         title: config.title,
         description: config.description,

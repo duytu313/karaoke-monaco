@@ -1,73 +1,130 @@
-import { NextResponse } from "next/server"; // Chỉ dùng rtdb
+import { NextResponse } from "next/server";
 import { rtdb, admin } from "@/lib/firebaseAdmin";
 
+/**
+ * API Utility để khôi phục và đồng bộ điểm từ tất cả các đơn hàng đã thanh toán.
+ */
 export async function POST(request: Request) {
   try {
-    const { bookingId } = await request.json();
-
-    if (!bookingId) {
-      return NextResponse.json({ message: "Thiếu mã đơn hàng" }, { status: 400 });
+    const bookingsSnapshot = await rtdb.ref("bookings").once("value");
+    if (!bookingsSnapshot.exists()) {
+      return NextResponse.json({ message: "Không có dữ liệu đơn hàng" });
     }
 
-    // 1. Lấy thông tin đơn hàng từ Realtime Database
-    const bookingRef = rtdb.ref(`bookings/${bookingId}`);
-    const bookingSnapshot = await bookingRef.once('value');
+    const bookings = bookingsSnapshot.val();
+    const stats = { total: 0, processed: 0, synced: 0, skipped: 0 };
 
-    if (!bookingSnapshot.exists()) {
-      return NextResponse.json({ message: "Không tìm thấy đơn hàng" }, { status: 404 });
-    }
-
-    const bookingData = bookingSnapshot.val();
-    if (bookingData?.status === "Đã thanh toán") {
-      return NextResponse.json({ message: "Đơn hàng đã được hoàn thành trước đó" }, { status: 400 });
-    }
-
-    const userId = bookingData?.userId;
-    const totalAmount = bookingData?.totalAmount || 0;
-    const pointsToAdd = Math.floor(totalAmount / 10000); // 10,000đ = 1 điểm
-
-    // 2. Cập nhật trạng thái đơn hàng và điểm người dùng trong Realtime Database
-    // RTDB có transaction cho từng node, nhưng không có transaction đa node như Firestore
-    // Nên ta sẽ cập nhật tuần tự, hoặc dùng Cloud Functions để đảm bảo atomicity tốt hơn
-    await bookingRef.update({ status: "Đã thanh toán" });
-
-    if (userId && userId !== "guest") {
-      const usernameSnapshot = await rtdb.ref(`users/uidMap/${userId}`).once("value")
-      const userKey = usernameSnapshot.exists() ? usernameSnapshot.val() : userId
-
-      // Cộng điểm cho user trong Realtime Database
-      // Sử dụng transaction của RTDB để đảm bảo cập nhật điểm an toàn
-      const userPointsRef = rtdb.ref(`users/profiles/${userKey}/points`)
-      await userPointsRef.transaction((currentPoints: number | null) => {
-        return (currentPoints || 0) + pointsToAdd
-      })
+    for (const [bookingId, data] of Object.entries(bookings) as [string, any][]) {
+      stats.total++;
       
-      // Lưu lịch sử tích điểm vào một node riêng nếu cần
-      const pointHistoryRef = rtdb.ref(`users/profiles/${userKey}/pointHistory`).push()
-      await pointHistoryRef.set({
-        type: "earn",
-        bookingId: bookingId,
-        points: pointsToAdd,
-        timestamp: admin.database.ServerValue.TIMESTAMP,
-        description: `Tích điểm từ đơn hàng #${bookingId}`
-      })
+      // Lọc các đơn chính xác là "Đã thanh toán" và thuộc về thành viên
+      const isPaid = data.status === "Đã thanh toán";
+      const isMember = data.userId && data.userId !== "guest";
 
-      // 3. Gửi thông báo hoàn thành đơn hàng và tích điểm
-      const notificationRef = rtdb.ref(`notifications/personal/${userId}`).push();
-      await notificationRef.set({
-        title: "Thanh toán thành công",
-        description: `Đơn hàng #${bookingId.slice(-5)} đã hoàn tất. Bạn đã tích thêm ${pointsToAdd} điểm. Cảm ơn quý khách!`,
-        href: `/orders/${bookingId}`,
-        type: "order",
-        time: "Mới đây",
-        createdAt: admin.database.ServerValue.TIMESTAMP,
-        read: false,
-      });
+      if (isPaid && isMember) {
+        stats.processed++;
+        const userId = data.userId;
+        
+        // Ưu tiên điểm đã có sẵn trong đơn hàng
+        let pointsToAdd = 0;
+        let finalAmount = 0;
+
+        // Ưu tiên sử dụng điểm đã được ghi nhận trên đơn hàng nếu có
+        const existingPoints = data.pointsEarned ?? data.points;
+
+        const roomPrice = Number(data.totalEst || data.roomPrice || 0);
+        const services = data.services || data.items || [];
+        const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.price * (s.quantity || s.qty || 1)), 0);
+        const totalAmount = Number(data.totalAmount || 0);
+        const paidAmount = Number(data.paidAmount || 0);
+        const subtotal = Math.max(totalAmount, roomPrice + servicesTotal, paidAmount);
+
+        if (typeof existingPoints === 'number' && existingPoints > 0) {
+          pointsToAdd = existingPoints;
+          finalAmount = data.finalAmount || subtotal;
+        } else {
+          let voucherDiscount = 0;
+          if (data.appliedVoucher) {
+            const v = data.appliedVoucher;
+            voucherDiscount = v.discountAmount ? Math.min(v.discountAmount, subtotal) : 
+                              (v.discountRate ? Math.floor(subtotal * v.discountRate) : 0);
+          }
+          const rewardDiscount = Number(data.appliedRewardDiscount || 0);
+          finalAmount = Math.max(0, subtotal - voucherDiscount - rewardDiscount);
+          pointsToAdd = Math.floor(finalAmount / 10000);
+        }
+
+        if (pointsToAdd <= 0) {
+          stats.skipped++;
+          continue;
+        }
+
+        // Lấy username (userKey) từ uidMap hoặc tìm trong profiles
+        const uidMapSnapshot = await rtdb.ref(`users/uidMap/${userId}`).once("value");
+        let userKey = uidMapSnapshot.exists() ? uidMapSnapshot.val() : null;
+
+        if (!userKey) {
+          // Fallback: Nếu uidMap không có, tìm trong profiles dựa trên authUid
+          const profilesSnapshot = await rtdb.ref("users/profiles").once("value");
+          const profiles = profilesSnapshot.exists() ? profilesSnapshot.val() : {};
+          const profileByAuthUid = Object.entries(profiles).find(([, prof]: [string, any]) => prof.authUid === userId);
+          userKey = profileByAuthUid ? profileByAuthUid[0] : userId; // Nếu vẫn không tìm thấy, dùng userId làm key (ít lý tưởng)
+        }
+
+        // Kiểm tra xem đã có lịch sử cho đơn này chưa (dựa trên bookingId)
+        const historyRef = rtdb.ref(`users/profiles/${userKey}/pointHistory`);
+        const historySnapshot = await historyRef.orderByChild("bookingId").equalTo(bookingId).once("value");
+        const historyExists = historySnapshot.exists();
+        const storedPoints = data.pointsEarned || 0;
+
+        // Cho phép đồng bộ nếu chưa có lịch sử HOẶC số điểm đã lưu khác với số điểm tính toán lại (sửa sai)
+        if (!historyExists || storedPoints !== pointsToAdd) {
+          const diff = pointsToAdd - storedPoints;
+
+          // 1. Cập nhật/Đánh dấu lại thông tin điểm vào Object Booking
+          await rtdb.ref(`bookings/${bookingId}`).update({
+            pointsEarned: pointsToAdd,
+            finalAmount: finalAmount,
+            paidAmount: data.paidAmount || finalAmount
+          });
+
+          // 2. Tạo hoặc cập nhật bản ghi lịch sử điểm
+          const historyData = {
+            type: "earn",
+            bookingId,
+            points: pointsToAdd,
+            timestamp: data.completedAt || data.createdAt || Date.now(),
+            description: `Khôi phục tích điểm đơn #${bookingId} (${new Intl.NumberFormat("vi-VN").format(finalAmount)}đ)`,
+          };
+
+          if (!historyExists) {
+            await historyRef.push(historyData);
+          } else {
+            const entryKey = Object.keys(historySnapshot.val())[0];
+            await rtdb.ref(`users/profiles/${userKey}/pointHistory/${entryKey}`).update(historyData);
+          }
+
+          // 3. Cộng dồn vào tổng điểm của User (Dùng transaction để tránh sai sót)
+          if (diff !== 0) {
+            const userPointsRef = rtdb.ref(`users/profiles/${userKey}/points`);
+            await userPointsRef.transaction((current) => (current || 0) + diff);
+          }
+          
+          stats.synced++;
+        } else {
+          stats.skipped++;
+        }
+      } else {
+        stats.skipped++;
+      }
     }
 
-    return NextResponse.json({ message: "Hoàn thành đơn và tích điểm thành công", pointsAdded: pointsToAdd }, { status: 200 });
+    return NextResponse.json({ 
+      message: `Đồng bộ hoàn tất! Đã khôi phục ${stats.synced} đơn hàng.`, 
+      stats 
+    });
   } catch (error: any) {
-    console.error("Complete Booking Error:", error);
+    console.error("Sync Error:", error);
     return NextResponse.json({ message: "Lỗi hệ thống", error: error.message }, { status: 500 });
   }
 }

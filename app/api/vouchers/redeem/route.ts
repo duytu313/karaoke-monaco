@@ -58,6 +58,26 @@ const VOUCHER_CATALOG: Record<string, { title: string; description: string; poin
   },
 };
 
+async function sendRedeemNotification(
+  userId: string | undefined,
+  title: string,
+  description: string,
+  href = "/wallet/vouchers"
+) {
+  if (!userId || userId === "guest") return;
+
+  const notifRef = rtdb.ref(`notifications/personal/${userId}`).push();
+  await notifRef.set({
+    title,
+    description,
+    href,
+    type: "system",
+    time: "Mới đây",
+    createdAt: admin.database.ServerValue.TIMESTAMP,
+    read: false,
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const { userId, voucherId } = await request.json();
@@ -68,6 +88,11 @@ export async function POST(request: Request) {
 
     const voucher = VOUCHER_CATALOG[voucherId];
     if (!voucher) {
+      await sendRedeemNotification(
+        userId,
+        "Đổi điểm không thành công",
+        "Voucher bạn chọn không hợp lệ hoặc không còn khả dụng. Vui lòng chọn ưu đãi khác."
+      );
       return NextResponse.json({ message: "Voucher không hợp lệ" }, { status: 400 });
     }
 
@@ -84,16 +109,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Không tìm thấy hồ sơ người dùng" }, { status: 404 });
     }
 
-    const userData = userSnapshot.val();
-    const currentPoints = userData.points || 0;
+    const pointsRef = userRef.child("points");
+    const pointsResult = await pointsRef.transaction((current) => {
+      const currentPoints = Number(current || 0);
+      if (currentPoints < voucher.pointsCost) return;
+      return currentPoints - voucher.pointsCost;
+    });
 
-    if (currentPoints < voucher.pointsCost) {
+    if (!pointsResult.committed) {
+      await sendRedeemNotification(
+        userId,
+        "Đổi điểm không thành công",
+        `Bạn chưa đủ ${voucher.pointsCost.toLocaleString("vi-VN")} điểm để đổi "${voucher.title}". Hãy tích thêm điểm và thử lại.`,
+      );
       return NextResponse.json({ message: "Không đủ điểm" }, { status: 400 });
     }
 
-    // Trừ điểm
-    const newPoints = currentPoints - voucher.pointsCost;
-    await userRef.update({ points: newPoints });
+    const newPoints = Number(pointsResult.snapshot.val() || 0);
 
     // Lưu voucher đã đổi vào user
     const ownVoucherRef = rtdb.ref(`users/profiles/${userKey}/ownVouchers`).push();
@@ -123,17 +155,12 @@ export async function POST(request: Request) {
       description: `Đổi voucher "${voucher.title}"`,
     });
 
-    // Gửi thông báo
-    const notifRef = rtdb.ref(`notifications/personal/${userId}`).push();
-    await notifRef.set({
-      title: "Đổi voucher thành công",
-      description: `Bạn đã đổi voucher "${voucher.title}" thành công! Mã: ${voucher.code}. Kiểm tra tại mục Voucher để sử dụng.`,
-      href: "/wallet/vouchers",
-      type: "system",
-      time: "Mới đây",
-      createdAt: admin.database.ServerValue.TIMESTAMP,
-      read: false,
-    });
+    await sendRedeemNotification(
+      userId,
+      "Đổi điểm thành công",
+      `Bạn đã dùng ${voucher.pointsCost.toLocaleString("vi-VN")} điểm để đổi "${voucher.title}" thành công. Mã voucher: ${voucher.code}.`,
+      "/wallet/vouchers"
+    );
 
     return NextResponse.json({
       message: `Đổi voucher "${voucher.title}" thành công!`,

@@ -3,9 +3,14 @@ import { rtdb, admin } from "@/lib/firebaseAdmin";
 
 export async function POST(request: Request) {
   try {
-    const { bookingId, userId, status } = await request.json();
+    const { bookingId, status } = await request.json();
+    const normalizedStatus = status === "pending"
+      ? "Chờ xác nhận"
+      : status === "Đang sử dụng"
+        ? "Đang dùng"
+        : status;
 
-    if (!bookingId || !status) {
+    if (!bookingId || !normalizedStatus) {
       return NextResponse.json({ message: "Thiếu thông tin" }, { status: 400 });
     }
 
@@ -19,16 +24,39 @@ export async function POST(request: Request) {
 
     const bookingData = bookingSnapshot.val();
 
-    // Cập nhật status
-    await bookingRef.update({ status });
+    const statusTimeField: Record<string, string> = {
+      "Chờ xác nhận": "pendingAt",
+      "Đã xác nhận": "confirmedAt",
+      "Đã đến": "arrivedAt",
+      "Đang dùng": "startedAt",
+      "Đã thanh toán": "completedAt",
+      "Đã hủy": "cancelledAt",
+    };
 
-    // Gửi thông báo cho user nếu có userId
-    const targetUserId = userId || bookingData?.userId;
+    const updateData: Record<string, any> = { status: normalizedStatus };
+    const timeField = statusTimeField[normalizedStatus];
+    if (timeField) {
+      updateData[timeField] = admin.database.ServerValue.TIMESTAMP;
+    }
+
+    // Cập nhật status
+    await bookingRef.update(updateData);
+
+    // Luôn gửi cho chủ đơn hàng, không dùng uid của người thao tác.
+    const targetUserId = bookingData?.userId;
     if (targetUserId && targetUserId !== "guest") {
       const notificationConfig: Record<string, { title: string; description: string }> = {
+        "Chờ xác nhận": {
+          title: "Đơn hàng đang chờ xác nhận",
+          description: `Đơn hàng #${bookingId.slice(-6)} của bạn đã được tạo và đang chờ Monaco xác nhận.`,
+        },
         "Đã xác nhận": {
           title: "✅ Đơn hàng đã được xác nhận",
           description: `Đơn hàng #${bookingId.slice(-6)} của bạn đã được xác nhận. Chúng tôi đang chuẩn bị dịch vụ cho bạn!`,
+        },
+        "Đã đến": {
+          title: "Khách đã đến",
+          description: `Đơn hàng #${bookingId.slice(-6)} đã được ghi nhận là khách đã đến. Monaco sẽ sắp xếp dịch vụ ngay cho bạn.`,
         },
         "Đang dùng": {
           title: "🎤 Bắt đầu dịch vụ",
@@ -44,7 +72,7 @@ export async function POST(request: Request) {
         },
       };
 
-      const config = notificationConfig[status];
+      const config = notificationConfig[normalizedStatus];
       if (config) {
         const notificationRef = rtdb.ref(`notifications/personal/${targetUserId}`).push();
         await notificationRef.set({
@@ -61,7 +89,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ 
       message: "Cập nhật trạng thái thành công", 
-      status 
+      status: normalizedStatus
     }, { status: 200 });
   } catch (error: any) {
     console.error("Update booking status error:", error);

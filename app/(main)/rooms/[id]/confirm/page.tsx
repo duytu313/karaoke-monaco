@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Ticket, Calendar, Clock, Users, MessageSquare, Plus, Minus, Trash2, Sparkles, X } from "lucide-react"
+import { ArrowLeft, Ticket, Calendar, Clock, Users, MessageSquare, Plus, Minus, Trash2, Sparkles, X, Gift, Check } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -37,6 +37,16 @@ interface Voucher {
   minTotal: number
 }
 
+interface RewardItem {
+  id: string
+  title: string
+  description: string
+  discountAmount?: number
+  discountRate?: number
+  minTotal: number
+  status: string
+}
+
 interface BookingDetails {
   room: string
   date: string
@@ -57,6 +67,12 @@ export default function ConfirmBookingPage() {
   const [voucherCode, setVoucherCode] = useState("")
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null)
   const [voucherError, setVoucherError] = useState<string | null>(null)
+
+  // Reward vault
+  const [rewards, setRewards] = useState<RewardItem[]>([])
+  const [loadingRewards, setLoadingRewards] = useState(true)
+  const [selectedReward, setSelectedReward] = useState<RewardItem | null>(null)
+  const [showRewardSelect, setShowRewardSelect] = useState(false)
 
   const vouchers: Voucher[] = [
     {
@@ -116,12 +132,44 @@ export default function ConfirmBookingPage() {
     note: ""
   })
 
+  // Tính discount từ voucher
   const voucherDiscount = appliedVoucher && bookingDetails.total >= appliedVoucher.minTotal
     ? appliedVoucher.discountAmount
       ? Math.min(appliedVoucher.discountAmount, bookingDetails.total)
       : Math.floor(bookingDetails.total * (appliedVoucher.discountRate || 0))
     : 0
-  const finalTotal = Math.max(0, bookingDetails.total - voucherDiscount)
+
+  // Tính discount từ reward vault
+  const rewardDiscount = selectedReward && bookingDetails.total >= (selectedReward.minTotal || 0)
+    ? selectedReward.discountAmount
+      ? Math.min(selectedReward.discountAmount, bookingDetails.total)
+      : Math.floor(bookingDetails.total * (selectedReward.discountRate || 0))
+    : 0
+
+  const totalDiscount = voucherDiscount + rewardDiscount
+  const finalTotal = Math.max(0, bookingDetails.total - totalDiscount)
+
+  // Fetch reward vault - chỉ lấy những thưởng active
+  useEffect(() => {
+    if (!user?.uid) {
+      setLoadingRewards(false)
+      return
+    }
+    fetch(`/api/reward-vault?userId=${user.uid}&status=active`)
+      .then(res => res.json())
+      .then(data => {
+        // Lọc thưởng theo loại dịch vụ nếu có
+        const filteredRewards = (data.rewards || []).filter((r: any) => {
+          // Nếu thưởng áp dụng cho tất cả dịch vụ hoặc không có thông tin loại
+          if (!r.serviceType || r.serviceType === "all") return true
+          // Nếu thưởng áp dụng cho loại dịch vụ đang đặt
+          return r.serviceType === roomInfo?.type
+        })
+        setRewards(filteredRewards)
+      })
+      .catch(console.error)
+      .finally(() => setLoadingRewards(false))
+  }, [user, roomInfo])
 
   const handleApplyVoucher = () => {
     setVoucherError(null)
@@ -148,6 +196,15 @@ export default function ConfirmBookingPage() {
     }
 
     setAppliedVoucher(found)
+  }
+
+  const handleApplyReward = (reward: RewardItem) => {
+    setSelectedReward(reward)
+    setShowRewardSelect(false)
+  }
+
+  const handleRemoveReward = () => {
+    setSelectedReward(null)
   }
 
   useEffect(() => {
@@ -181,7 +238,6 @@ export default function ConfirmBookingPage() {
     fetchData()
   }, [id])
 
-  // Hàm đồng bộ dữ liệu ngược lại localStorage
   const syncToLocalStorage = (details: any) => {
     const parsed = JSON.parse(localStorage.getItem(`temp_booking_info_${id}`) || "{}")
     const updatedData = {
@@ -230,26 +286,48 @@ export default function ConfirmBookingPage() {
   const handleConfirm = async () => {
     setIsLoading(true)
     try {
+      const body: any = {
+        userId: user?.uid || "guest",
+        type: roomInfo?.type || "karaoke",
+        items: bookingDetails.services,
+        note: bookingDetails.note,
+        bookingDate: bookingDetails.date,
+        bookingTime: bookingDetails.time,
+        totalAmount: bookingDetails.total,
+        finalAmount: finalTotal,
+        guestCount: bookingDetails.guests,
+      }
+
+      // Gửi thông tin voucher code nếu có
+      if (appliedVoucher) {
+        body.appliedVoucher = {
+          code: appliedVoucher.code,
+          title: appliedVoucher.title,
+          discountAmount: appliedVoucher.discountAmount,
+          discountRate: appliedVoucher.discountRate,
+        }
+      }
+
+      // Gửi thông tin reward từ vault nếu có
+      if (selectedReward) {
+        body.appliedRewardId = selectedReward.id
+        body.appliedRewardTitle = selectedReward.title
+        body.appliedRewardDescription = selectedReward.description // Thêm mô tả phần thưởng
+        body.appliedRewardDiscount = rewardDiscount
+      }
+
       const response = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user?.uid || "guest",
-          type: roomInfo?.type || "karaoke",
-          items: bookingDetails.services,
-          note: bookingDetails.note,
-          bookingDate: bookingDetails.date,
-          bookingTime: bookingDetails.time,
-          totalAmount: bookingDetails.total,
-          guestCount: bookingDetails.guests,
-        }),
+        body: JSON.stringify(body),
       })
 
       if (response.ok) {
         localStorage.removeItem(`temp_booking_info_${id}`)
         router.push("/orders")
       } else {
-        alert("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.")
+        const data = await response.json()
+        alert(data.message || "Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.")
       }
     } catch (error) {
       console.error("Confirm error:", error)
@@ -375,69 +453,222 @@ export default function ConfirmBookingPage() {
           </div>
         </div>
 
-        {/* Voucher Input Section */}
+        {/* Ưu đãi & Khuyến mãi Section */}
         <div className="bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm p-4 space-y-3">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-primary px-1">Ưu đãi & Khuyến mãi</h2>
-          <Separator className="bg-border/30" />
-          <div className="flex gap-2">
-            <Input
-              placeholder="Nhập mã voucher (VD: GIAM100K)"
-              value={voucherCode}
-              onChange={(e) => setVoucherCode(e.target.value)}
-              className="bg-muted/20 border-border/50 h-10 text-sm uppercase"
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              className="h-10 px-4 font-bold text-xs shrink-0"
-              onClick={handleApplyVoucher}
-            >
-              Áp dụng
-            </Button>
+          <div className="flex items-center justify-between">
+            <h2 className="text-[10px] font-bold uppercase tracking-widest text-primary px-1">Ưu đãi & Khuyến mãi</h2>
+            {user && rewards.length > 0 && (
+              <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+                {rewards.length} thưởng
+              </span>
+            )}
           </div>
+          <Separator className="bg-border/30" />
 
-          {voucherError && (
-            <p className="text-[10px] text-red-500 px-1 font-medium">{voucherError}</p>
-          )}
-
-          {appliedVoucher && (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 animate-in fade-in zoom-in duration-200">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="bg-emerald-100 p-2 rounded-xl">
-                    <Ticket className="h-4 w-4 text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-emerald-800">{appliedVoucher.title}</p>
-                    <p className="text-[10px] text-emerald-600">Mã: {appliedVoucher.code}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-emerald-600">-{formatPrice(voucherDiscount)}</span>
+          {/* Phần thưởng từ vault */}
+          {user && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Gift className="h-3 w-3" /> Phần thưởng đã đổi
+                </span>
+                {rewards.length > 0 && (
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-emerald-400 hover:text-emerald-600"
-                    onClick={() => {
-                      setAppliedVoucher(null)
-                      setVoucherCode("")
-                    }}
+                    size="sm"
+                    className="h-6 text-[10px] text-primary"
+                    onClick={() => setShowRewardSelect(!showRewardSelect)}
                   >
-                    <X className="h-4 w-4" />
+                    {showRewardSelect ? "Thu gọn" : `Xem tất cả`}
                   </Button>
-                </div>
+                )}
               </div>
+
+              {rewards.length === 0 && !loadingRewards && (
+                <div className="text-center py-4 text-muted-foreground">
+                  <Gift className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                  <p className="text-xs">Chưa có thưởng nào. Hãy đổi điểm để nhận ưu đãi!</p>
+                </div>
+              )}
+
+              {loadingRewards && (
+                <div className="text-center py-4 text-muted-foreground">
+                  <p className="text-xs italic">Đang tải thưởng...</p>
+                </div>
+              )}
+
+              {showRewardSelect && rewards.length > 0 && (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {rewards.map((reward: RewardItem) => (
+                      <Card
+                        key={reward.id}
+                        className={cn(
+                          "p-3 cursor-pointer transition-all border",
+                          selectedReward?.id === reward.id
+                            ? "border-primary bg-primary/5"
+                            : "border-emerald-200 hover:border-emerald-400"
+                        )}
+                        onClick={() => handleApplyReward(reward)}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Ticket className="h-4 w-4 text-emerald-600 shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-foreground truncate">{reward.title}</p>
+                              <p className="text-[10px] text-muted-foreground">{reward.description}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {selectedReward?.id === reward.id ? (
+                              <Check className="h-4 w-4 text-primary" />
+                            ) : (
+                              <span className="text-xs font-bold text-emerald-600">
+                                {reward.discountAmount ? `-${formatPrice(reward.discountAmount)}` : reward.discountRate ? `-${Math.round(reward.discountRate * 100)}%` : ""}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    )
+                  )}
+                </div>
+              )}
+
+              {!showRewardSelect && rewards.length > 0 && !selectedReward && (
+                <div className="space-y-2">
+                  {rewards.slice(0, 2).map((reward: RewardItem) => (
+                      <Card
+                        key={reward.id}
+                        className="p-3 cursor-pointer transition-all border border-emerald-200 hover:border-emerald-400"
+                        onClick={() => handleApplyReward(reward)}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Ticket className="h-4 w-4 text-emerald-600 shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-foreground truncate">{reward.title}</p>
+                              <p className="text-[10px] text-muted-foreground">{reward.description}</p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-emerald-600">
+                            {reward.discountAmount ? `-${formatPrice(reward.discountAmount)}` : reward.discountRate ? `-${Math.round(reward.discountRate * 100)}%` : ""}
+                          </span>
+                        </div>
+                      </Card>
+                    )
+                  )}
+                  {rewards.length > 2 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs text-primary"
+                      onClick={() => setShowRewardSelect(true)}
+                    >
+                      Xem thêm {rewards.length - 2} thưởng
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {selectedReward && (
+                <div className="rounded-2xl border border-primary/30 bg-primary/5 p-3 animate-in fade-in zoom-in duration-200">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-2 rounded-xl">
+                        <Gift className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-foreground">{selectedReward.title}</p>
+                        <p className="text-[10px] text-muted-foreground">Phần thưởng đã đổi</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-primary">-{formatPrice(rewardDiscount)}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-red-500"
+                        onClick={handleRemoveReward}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
+
+          {!user && (
+            <div className="text-center py-4 text-muted-foreground">
+              <Gift className="h-8 w-8 mx-auto mb-2 opacity-30" />
+              <p className="text-xs">Đăng nhập để xem phần thưởng đã đổi</p>
+            </div>
+          )}
+
+          {/* Nhập mã voucher */}
+          <div>
+            <span className="text-xs font-medium text-muted-foreground mb-2 block">Nhập mã voucher</span>
+            <div className="flex gap-2">
+              <Input
+                placeholder="VD: GIAM100K"
+                value={voucherCode}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVoucherCode(e.target.value)}
+                className="bg-muted/20 border-border/50 h-10 text-sm uppercase"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-10 px-4 font-bold text-xs shrink-0"
+                onClick={handleApplyVoucher}
+              >
+                Áp dụng
+              </Button>
+            </div>
+
+            {voucherError && (
+              <p className="text-[10px] text-red-500 px-1 font-medium mt-1">{voucherError}</p>
+            )}
+
+            {appliedVoucher && (
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 mt-2 animate-in fade-in zoom-in duration-200">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-emerald-100 p-2 rounded-xl">
+                      <Ticket className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-800">{appliedVoucher.title}</p>
+                      <p className="text-[10px] text-emerald-600">Mã: {appliedVoucher.code}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-emerald-600">-{formatPrice(voucherDiscount)}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-emerald-400 hover:text-emerald-600"
+                      onClick={() => {
+                        setAppliedVoucher(null)
+                        setVoucherCode("")
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Note Section */}
         <div className="bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm p-4 space-y-3">
           <h2 className="text-[10px] font-bold uppercase tracking-widest text-primary px-1">Ghi chú cho quán</h2>
           <Separator className="bg-border/30" />
-          <Textarea 
-            value={bookingDetails.note}
-            onChange={(e) => updateNote(e.target.value)}
+            <Textarea 
+              value={bookingDetails.note}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateNote(e.target.value)}
             placeholder="Thêm ghi chú của bạn..."
             className="text-sm bg-muted/20 border-border/50 focus-visible:ring-primary/20 min-h-[80px] italic"
           />
@@ -451,12 +682,16 @@ export default function ConfirmBookingPage() {
       {/* Summary & Footer Button */}
       <div className="sticky bottom-0 z-40 p-4 bg-background/95 backdrop-blur-lg border-t border-border/30 space-y-4">
         <div className="space-y-2 px-1">
-          {voucherDiscount > 0 && (
+          {totalDiscount > 0 && (
             <div className="flex justify-between items-center rounded-2xl bg-emerald-50 border border-emerald-200 px-3 py-2">
-              <span className="text-sm text-foreground">Đã giảm</span>
-              <span className="text-sm font-bold text-emerald-600">-{formatPrice(voucherDiscount)}</span>
+              <span className="text-sm text-foreground">Tổng giảm</span>
+              <span className="text-sm font-bold text-emerald-600">-{formatPrice(totalDiscount)}</span>
             </div>
           )}
+          <div className="flex justify-between items-center">
+            <span className="text-base text-foreground">Tổng thanh toán</span>
+            <span className="text-xl font-black text-foreground">{formatPrice(finalTotal)}</span>
+          </div>
         </div>
         <Button 
           onClick={handleConfirm}

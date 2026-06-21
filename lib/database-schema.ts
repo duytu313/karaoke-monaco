@@ -36,7 +36,7 @@ export interface User {
   password?: string;
 }
 
-export type BookingStatus = 'Chờ xác nhận' | 'Đã xác nhận' | 'Đang dùng' | 'Đã thanh toán' | 'Đã hủy';
+export type BookingStatus = 'Chờ xác nhận' | 'Đã xác nhận' | 'Đã đến' | 'Đang dùng' | 'Đã thanh toán' | 'Đã hủy';
 
 export interface Booking {
   userId: string;
@@ -46,10 +46,25 @@ export interface Booking {
   roomId?: string;
   roomName?: string;
   items?: any[];
+  services?: any[];
   note?: string;
   bookingDate: string;
   bookingTime: string;
-  totalAmount: number;
+  totalAmount: number;      // Tổng tiền gốc (roomPrice + services)
+  roomPrice?: number;        // Tiền phòng (lễ tân nhập)
+  finalAmount?: number;      // Tổng thanh toán cuối cùng (sau giảm giá)
+  paidAmount?: number;       // Số tiền khách đã thanh toán thực tế
+  pointsEarned?: number;     // Số điểm tích lũy từ đơn hàng này (để đồng bộ)
+  completedAt?: number;      // Thời điểm thanh toán
+  guestCount?: number;
+  guests?: string;
+  appliedVoucher?: {
+    code: string;
+    title?: string;
+    discountAmount?: number | null;
+    discountRate?: number | null;
+  };
+  appliedRewardId?: string | null;
   status: BookingStatus;
   createdAt: number;
 }
@@ -72,6 +87,15 @@ export interface PointExchange {
   status: "pending" | "completed" | "cancelled";
   description: string;
   bookingId?: string;
+}
+
+export interface PointHistoryEntry {
+  type: "earn" | "spend";
+  points: number;
+  timestamp: number;
+  description: string;
+  bookingId?: string;
+  voucherCode?: string;
 }
 
 export interface RoomItem {
