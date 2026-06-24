@@ -11,13 +11,13 @@ export default function SplashPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/intro")
-    }, 1500) // Giảm thời gian splash xuống còn 1.5s hoặc 1s
+    }, 1500) 
 
     return () => clearTimeout(timer)
   }, [router])
 
   return (
-    <main className="min-h-screen w-full bg-background flex flex-col items-center justify-center px-4 sm:px-6">
+    <main className="min-h-[100dvh] w-full bg-background flex flex-col items-center justify-center px-4 sm:px-6">
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md">
         <Image
           src="/images/logo.png"
