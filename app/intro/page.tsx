@@ -71,37 +71,37 @@ export default function IntroPage() {
       {/* Content */}
       <div 
         key={currentSlide} 
-        className="relative z-10 min-h-screen flex flex-col justify-end px-6 pb-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 ease-out pointer-events-none"
+        className="relative z-10 min-h-screen flex flex-col justify-end px-4 sm:px-6 pb-8 sm:pb-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 ease-out pointer-events-none"
       >
         {/* Brand */}
-        <div className="mb-4 pointer-events-auto">
-          <p className="text-amber-300 text-xs tracking-[0.3em] font-medium opacity-90">
+        <div className="mb-3 sm:mb-4 pointer-events-auto">
+          <p className="text-amber-300 text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] font-medium opacity-90">
             MONACO KARAOKE
           </p>
         </div>
 
         {/* Slide Content */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white leading-tight whitespace-pre-line">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight whitespace-pre-line">
             Trải nghiệm{"\n"}đẳng cấp khác biệt
           </h1>
-          <p className="text-slate-200/90 mt-4 text-lg leading-relaxed max-w-2xl">
+          <p className="text-slate-200/90 mt-3 sm:mt-4 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl">
             Hệ thống giải trí hàng đầu với Karaoke, Massage, Nhà hàng sang trọng bậc nhất.
           </p>
         </div>
 
         {/* Buttons */}
-        <div className="space-y-4 pointer-events-auto">
+        <div className="space-y-3 sm:space-y-4 pointer-events-auto">
           <Button
             asChild
             variant="outline"
-            className="w-full h-16 text-lg font-medium border-white text-white bg-white/10 hover:bg-white/20 rounded-xl"
+            className="w-full h-12 sm:h-14 md:h-16 text-base sm:text-lg font-medium border-white text-white bg-white/10 hover:bg-white/20 rounded-xl"
           >
             <Link href="/login">Đăng nhập</Link>
           </Button>
           <Button
             asChild
-            className="w-full h-16 text-lg font-bold bg-amber-400 hover:bg-amber-300 text-slate-950 border-amber-400 rounded-xl shadow-xl shadow-amber-500/20"
+            className="w-full h-12 sm:h-14 md:h-16 text-base sm:text-lg font-bold bg-amber-400 hover:bg-amber-300 text-slate-950 border-amber-400 rounded-xl shadow-xl shadow-amber-500/20"
           >
             <Link href="/register">Đăng ký</Link>
           </Button>
