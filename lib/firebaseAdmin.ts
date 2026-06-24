@@ -1,22 +1,22 @@
 import * as admin from "firebase-admin";
 
 if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      }),
-      databaseURL: process.env.DATABASE_URL,
-    });
-    console.log("Firebase Admin Initialized");
-  } catch (error) {
-    console.error("Firebase Admin Initialization Error:", error);
-  }
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
+    databaseURL: process.env.DATABASE_URL,
+  });
+
+  console.log("Firebase Admin Initialized");
 }
 
-const rtdb = admin.database();
-const auth = admin.auth();
+// 👉 KHÔNG khởi tạo trực tiếp ở top-level
+const getRTDB = () => admin.database();
+const getAuth = () => admin.auth();
 
-export { rtdb, auth, admin };
+export const rtdb = getRTDB();
+export const auth = getAuth();
+export { admin };
