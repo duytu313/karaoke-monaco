@@ -6,11 +6,26 @@ let authInstance: admin.auth.Auth | null = null;
 // Lazy initialization - chỉ khởi tạo khi thực sự cần
 const initializeFirebase = () => {
   if (!admin.apps.length) {
+    // Handle private key formatting - replace escaped newlines with actual newlines
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
+    
+    // Replace literal \n with actual newlines
+    privateKey = privateKey.replace(/\\n/g, "\n");
+    
+    // Remove surrounding quotes if present
+    privateKey = privateKey.replace(/^["']|["']$/g, "");
+    
+    // Ensure the key has proper line endings
+    privateKey = privateKey.replace(/\r\n/g, "\n");
+    
+    console.log("Initializing Firebase with private key length:", privateKey.length);
+    console.log("Private key starts with:", privateKey.substring(0, 30));
+    
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        privateKey: privateKey,
       }),
       databaseURL: process.env.DATABASE_URL,
     });
