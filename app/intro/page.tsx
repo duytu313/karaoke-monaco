@@ -14,16 +14,15 @@ const images = [
 ];
 
 const slideAnimations = [
-  "scale-125 translate-x-8 rotate-1",  // Slide 1: Phóng to, trượt phải & xoay nhẹ
-  "scale-125 -translate-x-8 -rotate-1", // Slide 2: Phóng to, trượt trái & xoay ngược
-  "scale-125 -translate-y-8 rotate-1", // Slide 3: Phóng to, trượt lên & xoay nhẹ
+  "scale-125 translate-x-8 rotate-1",
+  "scale-125 -translate-x-8 -rotate-1",
+  "scale-125 -translate-y-8 rotate-1",
 ];
 
 export default function IntroPage() {
   const [api, setApi] = useState<CarouselApi>()
   const [currentSlide, setCurrentSlide] = useState(0)
 
-  // Cập nhật index khi slide thay đổi (do vuốt hoặc tự động chạy)
   useEffect(() => {
     if (!api) return
     
@@ -32,7 +31,6 @@ export default function IntroPage() {
     })
   }, [api])
 
-  // Tự động chuyển slide sau mỗi 5 giây
   useEffect(() => {
     if (!api) return
     const timer = setInterval(() => {
@@ -42,14 +40,14 @@ export default function IntroPage() {
   }, [api])
 
   return (
-    <main className="min-h-screen w-full bg-slate-950/5 dark:bg-slate-950/40 relative overflow-hidden">
-      {/* Background Carousel - Trượt ngang và hỗ trợ vuốt */}
+    <main className="min-h-screen w-full bg-slate-950/5 dark:bg-slate-950/40 relative overflow-hidden flex flex-col justify-end">
+      {/* Background Carousel */}
       <Carousel 
         setApi={setApi} 
         opts={{ loop: true }} 
         className="absolute inset-0 z-0 cursor-grab active:cursor-grabbing"
       >
-        <CarouselContent className="h-screen ml-0">
+        <CarouselContent className="h-full ml-0">
           {images.map((src, index) => (
             <CarouselItem key={index} className="relative h-full basis-full overflow-hidden pl-0">
               <Image
@@ -71,7 +69,7 @@ export default function IntroPage() {
       {/* Content */}
       <div 
         key={currentSlide} 
-        className="relative z-10 min-h-screen flex flex-col justify-end px-4 sm:px-6 pb-8 sm:pb-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 ease-out pointer-events-none"
+        className="relative z-10 px-4 sm:px-6 pb-8 sm:pb-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 ease-out pointer-events-none"
       >
         {/* Brand */}
         <div className="mb-3 sm:mb-4 pointer-events-auto">

@@ -11,28 +11,30 @@ export default function SplashPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/intro")
-    }, 1500) 
+    }, 1500)
 
     return () => clearTimeout(timer)
   }, [router])
 
   return (
-    <main className="min-h-screen w-full bg-background flex flex-col items-center justify-center px-4 sm:px-6">
-      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md">
-        <Image
-          src="/images/logo.png"
-          alt="Monaco Logo"
-          width={240}
-          height={120}
-          className="h-auto object-contain w-48 sm:w-56 md:w-64"
-          priority
-        />
-        <p className="mt-4 text-xl sm:text-2xl font-bold tracking-[0.2em] sm:tracking-[0.3em] text-[#D4AF37]">
-          MONACO
-        </p>
-        <p className="text-xs sm:text-sm tracking-[0.3em] sm:tracking-[0.4em] text-[#D4AF37] mt-1">
-          KARAOKE
-        </p>
+    <main className="min-h-screen w-full bg-background flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6">
+        <div className="flex flex-col items-center w-full max-w-md">
+          <Image
+            src="/images/logo.png"
+            alt="Monaco Logo"
+            width={240}
+            height={120}
+            className="h-auto object-contain w-48 sm:w-56 md:w-64"
+            priority
+          />
+          <p className="mt-4 text-xl sm:text-2xl font-bold tracking-[0.2em] sm:tracking-[0.3em] text-[#D4AF37]">
+            MONACO
+          </p>
+          <p className="text-xs sm:text-sm tracking-[0.3em] sm:tracking-[0.4em] text-[#D4AF37] mt-1">
+            KARAOKE
+          </p>
+        </div>
       </div>
     </main>
   )
