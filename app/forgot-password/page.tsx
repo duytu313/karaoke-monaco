@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
   return (
     <main className="min-h-screen w-full bg-background flex flex-col">
       {/* Header */}
-      <header className="pt-6 px-6">
+      <header className="pt-10 px-6">
         <Link
           href="/login"
           className="inline-flex items-center text-muted-foreground hover:text-foreground"

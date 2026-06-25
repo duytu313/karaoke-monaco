@@ -40,7 +40,7 @@ export default function IntroPage() {
   }, [api])
 
   return (
-    <main className="min-h-screen w-full bg-slate-950/5 dark:bg-slate-950/40 relative overflow-hidden flex flex-col justify-end">
+    <div className="min-h-screen bg-slate-950/5 dark:bg-slate-950/40 relative overflow-hidden flex flex-col justify-end">
       {/* Background Carousel */}
       <Carousel 
         setApi={setApi} 
@@ -105,6 +105,6 @@ export default function IntroPage() {
           </Button>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

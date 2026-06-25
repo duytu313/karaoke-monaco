@@ -17,7 +17,7 @@ export default function SplashPage() {
   }, [router])
 
   return (
-    <main className="min-h-screen w-full bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6">
         <div className="flex flex-col items-center w-full max-w-md">
           <Image
@@ -36,6 +36,6 @@ export default function SplashPage() {
           </p>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
